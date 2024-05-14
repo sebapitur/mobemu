@@ -11,6 +11,7 @@ import mobemu.node.Node;
 import mobemu.node.Stats;
 import mobemu.parsers.UPB;
 import mobemu.trace.Parser;
+import mobemu.trace.Trace;
 
 /**
  * Main class for MobEmu.
@@ -19,6 +20,17 @@ import mobemu.trace.Parser;
  */
 public class MobEmu {
 
+    private static void runTrace(Node[] nodes, Trace traceData, boolean batteryComputation, boolean dissemination, long seed) {
+        List<Message> messages = Node.runTrace(nodes, traceData, batteryComputation, dissemination, seed);
+        System.out.println("Messages: " + messages.size());
+
+        // print opportunistic algorithm statistics
+        System.out.println(nodes[0].getName());
+        System.out.println("HitRate " + Stats.computeHitRate(messages, nodes, dissemination));
+        System.out.println("DeliveryCost " + Stats.computeDeliveryCost(messages, nodes, dissemination));
+        System.out.println("DeliveryLatency " + Stats.computeDeliveryLatency(messages, nodes, dissemination));
+        System.out.println("HopCount " + Stats.computeHopCount(messages, nodes, dissemination));
+    }
     public static void main(String[] args) {
         Parser parser = new UPB(UPB.UpbTrace.UPB2011);
 
@@ -38,15 +50,6 @@ public class MobEmu {
                     10000, 100, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
         }
 
-        // run the trace
-        List<Message> messages = Node.runTrace(nodes, parser.getTraceData(), false, dissemination, seed);
-        System.out.println("Messages: " + messages.size());
-
-        // print opportunistic algorithm statistics
-        System.out.println(nodes[0].getName());
-        System.out.println("" + Stats.computeHitRate(messages, nodes, dissemination));
-        System.out.println("" + Stats.computeDeliveryCost(messages, nodes, dissemination));
-        System.out.println("" + Stats.computeDeliveryLatency(messages, nodes, dissemination));
-        System.out.println("" + Stats.computeHopCount(messages, nodes, dissemination));
+        runTrace(nodes, parser.getTraceData(), false, dissemination, seed);
     }
 }
