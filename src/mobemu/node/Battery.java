@@ -52,6 +52,10 @@ public class Battery {
         return currentLevel;
     }
 
+    public double getPercentage() {
+        return currentLevel / maxLevel;
+    }
+
     /**
      * Sets the current battery level.
      *

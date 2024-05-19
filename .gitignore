@@ -4,3 +4,7 @@ nbproject/
 nbbuild.xml
 /bin/
 .DS_Store
+**/*.csv
+.idea/
+mobemu.iml
+out/

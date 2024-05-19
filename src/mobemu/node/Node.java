@@ -4,6 +4,10 @@
  */
 package mobemu.node;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import mobemu.communitydetection.KClique;
 import mobemu.trace.Contact;
@@ -769,6 +773,20 @@ public abstract class Node {
                         : (message.hasDestination(id));
 
                 if (condition) {
+
+                    String filename = "traces/upb-hyccups2012/successful2012.csv";
+                    PrintWriter writer = null;
+
+                    try {
+                        writer = new PrintWriter(new FileWriter(filename, true));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    writer.println(String.join(",", "" + message.id, "" + encounteredNode.id, "" + this.id));
+                    writer.close();
+
+
                     messagesForMe.add(message);
                     totalMessages++;
                 }

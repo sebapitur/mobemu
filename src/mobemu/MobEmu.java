@@ -32,7 +32,8 @@ public class MobEmu {
         System.out.println("HopCount " + Stats.computeHopCount(messages, nodes, dissemination));
     }
     public static void main(String[] args) {
-        Parser parser = new UPB(UPB.UpbTrace.UPB2011);
+//        Parser parser = new UPB(UPB.UpbTrace.UPB2011);
+        Parser parser = new UPB(UPB.UpbTrace.UPB2012);
 
         // print some trace statistics
         double duration = (double) (parser.getTraceData().getEndTime() - parser.getTraceData().getStartTime()) / (Parser.MILLIS_PER_MINUTE * 60);
