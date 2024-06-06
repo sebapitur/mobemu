@@ -48,9 +48,15 @@ public class MobEmu {
         Node[] nodes = new Node[parser.getNodesNumber()];
         for (int i = 0; i < nodes.length; i++) {
             nodes[i] = new Epidemic(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-                    10000, 100, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
+                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
         }
 
         runTrace(nodes, parser.getTraceData(), false, dissemination, seed);
+
+
+
+
+        Epidemic.writer.close();
+        Node.writer.close();
     }
 }
