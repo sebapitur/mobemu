@@ -751,6 +751,20 @@ public abstract class Node {
      * if routing is used
      * @return total number of messages still available for transfer
      */
+
+
+    public static PrintWriter writer = null;
+    static {
+        try {
+            String filename = "traces/upb-hyccups2012/successful2012.csv";
+            writer = new PrintWriter(new FileWriter(filename, true));
+            writer.println("messageId,lastRelay,destination");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     protected int deliverDirectMessages(Node encounteredNode, boolean altruism, long contactDuration, long currentTime, boolean dissemination) {
         List<Message> messagesForMe = new ArrayList<>();
         int maxMessages = network.computeMaxMessages(contactDuration);
@@ -774,17 +788,8 @@ public abstract class Node {
 
                 if (condition) {
 
-                    String filename = "traces/upb-hyccups2012/successful2012.csv";
-                    PrintWriter writer = null;
-
-                    try {
-                        writer = new PrintWriter(new FileWriter(filename, true));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
 
                     writer.println(String.join(",", "" + message.id, "" + encounteredNode.id, "" + this.id));
-                    writer.close();
 
 
                     messagesForMe.add(message);
