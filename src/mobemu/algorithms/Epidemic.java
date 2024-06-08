@@ -106,7 +106,7 @@ public class Epidemic extends Node {
 //            String newRelayLocalCentrality = df.format(this.getCentrality(true));
             String oldCommonCommunity = "" + (epidemicEncounteredNode.inLocalCommunity(message.getDestination()) ? 1 : 0);
             String newCommonCommunity = "" + (this.inLocalCommunity(message.getDestination()) ? 1 : 0);
-            String oldDataMemory = "" + ((float) epidemicEncounteredNode.getDataMemorySize() / epidemicEncounteredNode.getDataMemorySize());
+            String oldDataMemory = "" + ((float) epidemicEncounteredNode.getDataMemorySize() / epidemicEncounteredNode.dataMemorySize);
             String newDataMemory = "" + ((float) this.getDataMemorySize() / this.dataMemorySize);
 
             writer.println(
