@@ -94,8 +94,8 @@ public class Epidemic extends Node {
             String messageHopCount = "" + message.getHopCount(message.getDestination());
             String oldRelayId = "" + epidemicEncounteredNode.id;
             String newRelayId = "" + this.id;
-            String oldFriendWithDestination = "" + (epidemicEncounteredNode.socialNetwork[message.getDestination()] ? 1 : 0);
-            String newFriendWithDestination = "" + (this.socialNetwork[message.getDestination()] ? 1 : 0);
+            Integer oldFriendWithDestination = epidemicEncounteredNode.socialNetwork[message.getDestination()] ? 1 : 0;
+            Integer newFriendWithDestination = this.socialNetwork[message.getDestination()] ? 1 : 0;
             String oldRelayBattery = "" + epidemicEncounteredNode.getBattery().getPercentage();
             String newRelayBattery = "" + this.getBattery().getPercentage();
             // removed centrality for the moment because it is almost 0
@@ -104,8 +104,8 @@ public class Epidemic extends Node {
 //            String newRelayCentrality = df.format(this.getCentrality(false));
 //            String oldRelayLocalCentrality = df.format(epidemicEncounteredNode.getCentrality(true));
 //            String newRelayLocalCentrality = df.format(this.getCentrality(true));
-            String oldCommonCommunity = "" + (epidemicEncounteredNode.inLocalCommunity(message.getDestination()) ? 1 : 0);
-            String newCommonCommunity = "" + (this.inLocalCommunity(message.getDestination()) ? 1 : 0);
+            Integer oldCommonCommunity = epidemicEncounteredNode.inLocalCommunity(message.getDestination()) ? 1 : 0;
+            Integer newCommonCommunity = this.inLocalCommunity(message.getDestination())  ? 1 : 0;
             String oldDataMemory = "" + ((float) epidemicEncounteredNode.getDataMemorySize() / epidemicEncounteredNode.dataMemorySize);
             String newDataMemory = "" + ((float) this.getDataMemorySize() / this.dataMemorySize);
 
@@ -116,14 +116,14 @@ public class Epidemic extends Node {
                             messageSource,
                             messageHopCount,
                             oldRelayId,
-                            oldFriendWithDestination,
+                            oldFriendWithDestination.toString(),
                             oldRelayBattery,
-                            oldCommonCommunity,
+                            oldCommonCommunity.toString(),
                             oldDataMemory,
                             newRelayId,
-                            newFriendWithDestination,
+                            newFriendWithDestination.toString(),
                             newRelayBattery,
-                            newCommonCommunity,
+                            newCommonCommunity.toString(),
                             newDataMemory
                     )
             );

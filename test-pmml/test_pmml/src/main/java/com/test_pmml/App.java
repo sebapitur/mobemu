@@ -33,7 +33,7 @@ public final class App {
     public static void main(String[] args) {
         try {
             Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                .load(new File("model.pmml"))
+                .load(new File("model-svm.pmml"))
                 .build();
                 // Perforing the self-check
             evaluator.verify();
@@ -51,17 +51,17 @@ public final class App {
             System.out.println("Output fields: " + outputFields);
             
 
-            Map<String, Double> arguments = new HashMap<>();
+            Map<String, Object> arguments = new HashMap<>();
 
-            arguments.put("messageHopCount", -1.391444);
-            arguments.put("oldFriendWithDestination", -0.683533);
-            arguments.put("oldRelayBattery", 1.283821);
-            arguments.put("oldCommonCommunity", 2.060896);
-            arguments.put("oldDataMemory", -1.810907);
-            arguments.put("newFriendWithDestination", 1.268159);
-            arguments.put("newRelayBattery", 1.073882);
-            arguments.put("newCommonCommunity", -0.307097);
-            arguments.put("newDataMemory", -1.907413);
+            arguments.put("messageHopCount", 0);
+            arguments.put("oldFriendWithDestination", 1);
+            arguments.put("oldRelayBattery", 0.38);
+            arguments.put("oldCommonCommunity", 0);
+            arguments.put("oldDataMemory", 0.57);
+            arguments.put("newFriendWithDestination", 1);
+            arguments.put("newRelayBattery", 0.24);
+            arguments.put("newCommonCommunity", 0);
+            arguments.put("newDataMemory", 0.58);
 
             Map<String, ?> results = evaluator.evaluate(arguments);
             System.out.println(results);
