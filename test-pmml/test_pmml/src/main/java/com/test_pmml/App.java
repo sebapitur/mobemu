@@ -33,7 +33,7 @@ public final class App {
     public static void main(String[] args) {
         try {
             Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                .load(new File("model-svm.pmml"))
+                .load(new File("model-neural.pmml"))
                 .build();
                 // Perforing the self-check
             evaluator.verify();
