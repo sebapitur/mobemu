@@ -5,13 +5,25 @@
  */
 package mobemu.algorithms;
 
+import jakarta.xml.bind.JAXBException;
 import mobemu.node.ContactInfo;
 import mobemu.node.Context;
 import mobemu.node.Message;
 import mobemu.node.Node;
+import org.jpmml.evaluator.Evaluator;
+import org.jpmml.evaluator.EvaluatorUtil;
+import org.jpmml.evaluator.LoadingModelEvaluatorBuilder;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class for a Spray and Focus node.
@@ -27,15 +39,26 @@ import java.util.List;
 public class MlFocus extends Node {
 
     private final boolean altruismAnalysis;
-    private final long delta;
+    private static Evaluator evaluator;
+
+    static {
+        try {
+            // Get path from resources
+            URL modelUrl = MlFocus.class.getClassLoader().getResource("model-neural.pmml");
+            if (modelUrl == null) {
+                throw new RuntimeException("Could not find model-neural.pmml in resources");
+            }
+
+            evaluator = new LoadingModelEvaluatorBuilder()
+                    .load(new File(modelUrl.toURI()))
+                    .build();
+        } catch (IOException | ParserConfigurationException | SAXException | JAXBException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
-     * Default delta value.
-     */
-    private static final long DEFAULT_DELTA = 1000;
-
-    /**
-     * Instantiates a {@code SprayAndFocus} object.
+     * Instantiates a {@code MlFocus} object.
      *
      * @param id ID of the node
      * @param nodes total number of existing nodes
@@ -52,38 +75,14 @@ public class MlFocus extends Node {
      */
     public MlFocus(int id, int nodes, Context context, boolean[] socialNetwork, int dataMemorySize, int exchangeHistorySize,
                    long seed, long traceStart, long traceEnd, boolean altruism) {
-        this(id, nodes, context, socialNetwork, dataMemorySize, exchangeHistorySize, seed, traceStart, traceEnd, altruism, DEFAULT_DELTA);
-    }
-
-    /**
-     * Instantiates a {@code SprayAndFocus} object.
-     *
-     * @param id ID of the node
-     * @param nodes total number of existing nodes
-     * @param context the context of this node
-     * @param socialNetwork the social network as seen by this node
-     * @param dataMemorySize the maximum allowed size of the data memory
-     * @param exchangeHistorySize the maximum allowed size of the exchange
-     * history
-     * @param seed the seed for the random number generators
-     * @param traceStart timestamp of the start of the trace
-     * @param traceEnd timestamp of the end of the trace
-     * @param altruism {@code true} if altruism computations are performed,
-     * {@code false} otherwise
-     * @param delta minimum difference between encounter times for message
-     * transfer
-     */
-    public MlFocus(int id, int nodes, Context context, boolean[] socialNetwork, int dataMemorySize, int exchangeHistorySize,
-                   long seed, long traceStart, long traceEnd, boolean altruism, long delta) {
         super(id, nodes, context, socialNetwork, dataMemorySize, exchangeHistorySize, seed, traceStart, traceEnd);
-
         this.altruismAnalysis = altruism;
-        this.delta = delta;
     }
+
 
     @Override
     public String getName() {
-        return "Spray and Focus";
+        return "MlFocus";
     }
 
     @Override
@@ -103,7 +102,7 @@ public class MlFocus extends Node {
                 return;
             }
 
-            if (!runSprayAndFocus(message, mlFocusEncounteredNode, toRemove)) {
+            if (!runMlfocus(message, mlFocusEncounteredNode, toRemove)) {
                 continue;
             }
 
@@ -123,7 +122,7 @@ public class MlFocus extends Node {
                 return;
             }
 
-            if (!runSprayAndFocus(message, mlFocusEncounteredNode, toRemove)) {
+            if (!runMlfocus(message, mlFocusEncounteredNode, toRemove)) {
                 continue;
             }
 
@@ -146,26 +145,29 @@ public class MlFocus extends Node {
      * @return {@code true} if the message should be copied, {@code false}
      * otherwise
      */
-    private boolean runSprayAndFocus(Message message, MlFocus encounteredNode, List<Message> toRemove) {
+    private boolean runMlfocus(Message message, MlFocus encounteredNode, List<Message> toRemove) {
         // if a single message copy is left, perform the Focus phase
         if (message.getCopies(encounteredNode.id) == 1) {
-            // compute the last time each of the two nodes encountered the message's destination
-            long timeDestinationSeen = Long.MIN_VALUE;
-            long timeDestinationSeenEncountered = Long.MIN_VALUE;
+            // run the ML algorithm to find out if the encountered node is a better relay than the current
+            var mlAlgResult = false;
+            Map<String, Object> arguments = new HashMap<>();
+            arguments.put("messageHopCount", message.getHopCount(message.getDestination()));
+            arguments.put("oldFriendWithDestination", this.socialNetwork[message.getDestination()]);
+            arguments.put("oldRelayBattery", this.getBattery().getPercentage());
+            arguments.put("oldCommonCommunity", this.inLocalCommunity(message.getDestination()));
+            arguments.put("oldDataMemory", (float)(this.getDataMemorySize() / this.dataMemorySize));
+            arguments.put("newFriendWithDestination", encounteredNode.socialNetwork[message.getDestination()]);
+            arguments.put("newRelayBattery", encounteredNode.getBattery().getPercentage());
+            arguments.put("newCommonCommunity", encounteredNode.inLocalCommunity(message.getDestination()));
+            arguments.put("newDataMemory", (float)(encounteredNode.getDataMemorySize() / this.dataMemorySize));
 
-            ContactInfo info = encounteredNodes.get(message.getDestination());
-            if (info != null) {
-                timeDestinationSeen = info.getLastEncounterTime();
-            }
-
-            info = encounteredNode.encounteredNodes.get(message.getDestination());
-            if (info != null) {
-                timeDestinationSeenEncountered = info.getLastEncounterTime();
-            }
-
+            var results = evaluator.evaluate(arguments);
+            System.out.println("Big results for transfer " + results);
+            int finalResult = (int)EvaluatorUtil.decodeAll(results).get(evaluator.getTargetFields().get(0).getName());
+            System.out.println("Final result: " + finalResult);
             // if the node that doesn't have the message is the better one (has met
             // the destination more recently plus delta), transfer the message
-            if (timeDestinationSeen > timeDestinationSeenEncountered + delta) {
+            if (finalResult == 1) {
                 //encounteredNode.removeMessage(message, fromDataMemory);
                 toRemove.add(message);
                 return true;

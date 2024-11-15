@@ -6,6 +6,7 @@ package mobemu;
 
 import java.util.*;
 import mobemu.algorithms.Epidemic;
+import mobemu.algorithms.MlFocus;
 import mobemu.node.Message;
 import mobemu.node.Node;
 import mobemu.node.Stats;
@@ -52,9 +53,14 @@ public class MobEmu {
         long seed = 0;
         boolean dissemination = false;
         Node[] nodes = new Node[parser.getNodesNumber()];
+//        for (int i = 0; i < nodes.length; i++) {
+//            nodes[i] = new Epidemic(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
+//                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
+//        }
+
         for (int i = 0; i < nodes.length; i++) {
-            nodes[i] = new Epidemic(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
+            nodes[i] = new MlFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
+                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
         }
 
         runTrace(nodes, parser.getTraceData(), false, dissemination, seed);

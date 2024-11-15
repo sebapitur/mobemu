@@ -14,9 +14,10 @@ import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.EvaluatorUtil;
 import org.jpmml.evaluator.InputField;
 import org.jpmml.evaluator.LoadingModelEvaluatorBuilder;
+import org.jpmml.evaluator.ModelEvaluator;
 import org.jpmml.evaluator.TargetField;
 import org.xml.sax.SAXException;
-
+import org.jpmml.evaluator.neural_network.NeuralNetworkEvaluator;
 import jakarta.xml.bind.JAXBException;
 
 /**
@@ -32,6 +33,7 @@ public final class App {
      */
     public static void main(String[] args) {
         try {
+            System.out.println("Working Directory = " + System.getProperty("user.dir"));
             Evaluator evaluator = new LoadingModelEvaluatorBuilder()
                 .load(new File("model-neural.pmml"))
                 .build();
@@ -40,15 +42,11 @@ public final class App {
 
             // Printing input (x1, x2, .., xn) fields
             List<InputField> inputFields = evaluator.getInputFields();
-            System.out.println("Input fields: " + inputFields);
-
-            // Printing primary result (y) field(s)
-            List<TargetField> targetFields = evaluator.getTargetFields();
-            System.out.println("Target field(s): " + targetFields);
+            // System.out.println("Input fields: " + inputFields);
 
             // Printing secondary result (eg. probability(y), decision(y)) fields
             List<OutputField> outputFields = evaluator.getOutputFields();
-            System.out.println("Output fields: " + outputFields);
+            // System.out.println("Output fields: " + outputFields);
             
 
             Map<String, Object> arguments = new HashMap<>();
@@ -62,11 +60,8 @@ public final class App {
             arguments.put("newRelayBattery", 0.24);
             arguments.put("newCommonCommunity", 0);
             arguments.put("newDataMemory", 0.58);
-
-            Map<String, ?> results = evaluator.evaluate(arguments);
-            System.out.println(results);
-            // Making the model evaluator eligible for garbage collection
-            evaluator = null;
+            Object y = EvaluatorUtil.decodeAll(evaluator.evaluate(arguments)).get(evaluator.getTargetFields().get(0).getName());
+            System.out.println(EvaluatorUtil.decodeAll(evaluator.evaluate(arguments)).get(evaluator.getTargetFields().get(0).getName()));
 
         } catch (IOException | ParserConfigurationException | SAXException | JAXBException e) {
             e.printStackTrace();
