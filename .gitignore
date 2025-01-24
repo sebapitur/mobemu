@@ -8,3 +8,6 @@ nbbuild.xml
 .idea/
 mobemu.iml
 out/
+*.class
+settings.json
+target/

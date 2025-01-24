@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Haggle-Infocom2006" type="Application" factoryName="Application">
+    <envs>
+      <env name="MODEL" value="svm" />
+      <env name="OUTPUT_WRITE" value="true" />
+      <env name="TRACE" value="Haggle-Infocom2006" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="mobemu.MobEmu" />
+    <module name="mobemu" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
