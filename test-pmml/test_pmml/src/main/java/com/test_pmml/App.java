@@ -35,7 +35,7 @@ public final class App {
         try {
             System.out.println("Working Directory = " + System.getProperty("user.dir"));
             Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                .load(new File("model-neural.pmml"))
+                .load(new File("/home/seba/projects/mobemu/model-rf.pmml"))
                 .build();
                 // Perforing the self-check
             evaluator.verify();
@@ -60,6 +60,7 @@ public final class App {
             arguments.put("newRelayBattery", 0.24);
             arguments.put("newCommonCommunity", 0);
             arguments.put("newDataMemory", 0.58);
+            System.out.println(evaluator.evaluate(arguments));
             Object y = EvaluatorUtil.decodeAll(evaluator.evaluate(arguments)).get(evaluator.getTargetFields().get(0).getName());
             System.out.println(EvaluatorUtil.decodeAll(evaluator.evaluate(arguments)).get(evaluator.getTargetFields().get(0).getName()));
 

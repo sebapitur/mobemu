@@ -44,9 +44,9 @@ public class MlFocus extends Node {
     static {
         try {
             // Get path from resources
-            URL modelUrl = MlFocus.class.getClassLoader().getResource("model-neural.pmml");
+            URL modelUrl = MlFocus.class.getClassLoader().getResource("model-" + System.getenv("MODEL") + ".pmml");
             if (modelUrl == null) {
-                throw new RuntimeException("Could not find model-neural.pmml in resources");
+                throw new RuntimeException("Could not find model " + System.getenv("MODEL")  + " in resources");
             }
 
             evaluator = new LoadingModelEvaluatorBuilder()
@@ -149,8 +149,8 @@ public class MlFocus extends Node {
         // if a single message copy is left, perform the Focus phase
         if (message.getCopies(encounteredNode.id) == 1) {
             // run the ML algorithm to find out if the encountered node is a better relay than the current
-            var mlAlgResult = false;
             Map<String, Object> arguments = new HashMap<>();
+
             arguments.put("messageHopCount", message.getHopCount(message.getDestination()));
             arguments.put("oldFriendWithDestination", this.socialNetwork[message.getDestination()]);
             arguments.put("oldRelayBattery", this.getBattery().getPercentage());
@@ -162,9 +162,7 @@ public class MlFocus extends Node {
             arguments.put("newDataMemory", (float)(encounteredNode.getDataMemorySize() / this.dataMemorySize));
 
             var results = evaluator.evaluate(arguments);
-            System.out.println("Big results for transfer " + results);
             int finalResult = (int)EvaluatorUtil.decodeAll(results).get(evaluator.getTargetFields().get(0).getName());
-            System.out.println("Final result: " + finalResult);
             // if the node that doesn't have the message is the better one (has met
             // the destination more recently plus delta), transfer the message
             if (finalResult == 1) {

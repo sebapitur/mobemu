@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="UPB2012" type="Application" factoryName="Application">
+    <envs>
+      <env name="MODEL" value="svm" />
+      <env name="OUTPUT_WRITE" value="true" />
+      <env name="TRACE" value="UPB2012" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="mobemu.MobEmu" />
+    <module name="mobemu" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="mobemu.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -21,6 +21,20 @@ import mobemu.trace.Trace;
  */
 public abstract class Node {
 
+    public static PrintWriter writer = null;
+    public static Boolean outputWriteCondition = System.getenv("OUTPUT_WRITE").equals("true");
+    static {
+        try {
+            // String filename = "traces/upb-hyccups2012/successful2012.csv";
+            String filename = "dataset/" + System.getenv("TRACE") + "/successful.csv";
+            writer = new PrintWriter(new FileWriter(filename));
+            if (outputWriteCondition)
+                writer.println("messageId,lastRelay,destination");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // main node information
     protected int id; // ID of the current node
     protected int dataMemorySize; // size of a node's data memory
@@ -753,18 +767,6 @@ public abstract class Node {
      */
 
 
-    public static PrintWriter writer = null;
-    static {
-        try {
-            String filename = "traces/upb-hyccups2012/successful2012.csv";
-            writer = new PrintWriter(new FileWriter(filename, true));
-            writer.println("messageId,lastRelay,destination");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
     protected int deliverDirectMessages(Node encounteredNode, boolean altruism, long contactDuration, long currentTime, boolean dissemination) {
         List<Message> messagesForMe = new ArrayList<>();
         int maxMessages = network.computeMaxMessages(contactDuration);
@@ -788,8 +790,8 @@ public abstract class Node {
 
                 if (condition) {
 
-
-                    writer.println(String.join(",", "" + message.id, "" + encounteredNode.id, "" + this.id));
+                    if (outputWriteCondition)
+                        writer.println(String.join(",", "" + message.id, "" + encounteredNode.id, "" + this.id));
 
 
                     messagesForMe.add(message);

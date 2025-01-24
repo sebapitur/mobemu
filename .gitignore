@@ -10,3 +10,4 @@ mobemu.iml
 out/
 *.class
 settings.json
+target/

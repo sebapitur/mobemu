@@ -50,11 +50,11 @@ public class Haggle implements Parser {
             case CAMBRIDGE: {
                 calendar = Calendar.getInstance();
                 calendar.set(2005, 0, 25, 8, 0, 0); // start of the trace (06/01/2005 8:00)
-
+                System.out.println("Working Directory = " + System.getProperty("user.dir"));
                 String prefix = "traces" + File.separator + "cambridge-haggle-imote-cambridge" + File.separator;
                 this.trace = new Trace("Haggle Cambridge");
                 this.socialNetwork = new boolean[12][12];
-                parseHaggle(prefix + "contacts.Exp2.dat", prefix + "table.Exp2.dat", prefix + "MAC3BTable.Exp2.dat", 12);
+                parseHaggle(prefix + "contacts.Exp2.dat", prefix + "table.Exp2.dat", prefix + "MAC3Btable.Exp2.dat", 12);
                 break;
             }
             case INFOCOM: {
@@ -64,7 +64,7 @@ public class Haggle implements Parser {
                 String prefix = "traces" + File.separator + "cambridge-haggle-imote-infocom" + File.separator;
                 this.trace = new Trace("Haggle Infocom");
                 this.socialNetwork = new boolean[41][41];
-                parseHaggle(prefix + "contacts.Exp3.dat", prefix + "table.Exp3.dat", prefix + "MAC3BTable.Exp3.dat", 41);
+                parseHaggle(prefix + "contacts.Exp3.dat", prefix + "table.Exp3.dat", prefix + "MAC3Btable.Exp3.dat", 41);
                 break;
             }
             case CONTENT: {

@@ -4,15 +4,18 @@
  */
 package mobemu;
 
+import java.rmi.ServerError;
 import java.util.*;
 import mobemu.algorithms.Epidemic;
 import mobemu.algorithms.MlFocus;
+import mobemu.algorithms.SprayAndFocus;
 import mobemu.node.Message;
 import mobemu.node.Node;
 import mobemu.node.Stats;
 import mobemu.parsers.UPB;
 import mobemu.trace.Parser;
 import mobemu.trace.Trace;
+import mobemu.parsers.ParserFactory;
 /**
  * Main class for MobEmu.
  *
@@ -40,35 +43,46 @@ public class MobEmu {
     }
     public static void main(String[] args) {
 //        Parser parser = new UPB(UPB.UpbTrace.UPB2011);
-        Parser parser = new UPB(UPB.UpbTrace.UPB2012);
+        String chosenTrace = System.getenv("TRACE");
 
-        // print some trace statistics
-        double duration = (double) (parser.getTraceData().getEndTime() - parser.getTraceData().getStartTime()) / (Parser.MILLIS_PER_MINUTE * 60);
-        System.out.println("Trace duration in hours: " + duration);
-        System.out.println("Trace contacts: " + parser.getTraceData().getContactsCount());
-        System.out.println("Trace contacts per hour: " + (parser.getTraceData().getContactsCount() / duration));
-        System.out.println("Nodes: " + parser.getNodesNumber());
+        try {
+            Parser parser = ParserFactory.getInstance().getParser(chosenTrace);
+            // print some trace statistics
+            double duration = (double) (parser.getTraceData().getEndTime() - parser.getTraceData().getStartTime()) / (Parser.MILLIS_PER_MINUTE * 60);
+            System.out.println("Trace duration in hours: " + duration);
+            System.out.println("Trace contacts: " + parser.getTraceData().getContactsCount());
+            System.out.println("Trace contacts per hour: " + (parser.getTraceData().getContactsCount() / duration));
+            System.out.println("Nodes: " + parser.getNodesNumber());
 
-        // initialize Epidemic nodes
-        long seed = 0;
-        boolean dissemination = false;
-        Node[] nodes = new Node[parser.getNodesNumber()];
-//        for (int i = 0; i < nodes.length; i++) {
-//            nodes[i] = new Epidemic(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-//                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
-//        }
+            // initialize Epidemic nodes
+            long seed = 0;
+            boolean dissemination = false;
+            Node[] nodes = new Node[parser.getNodesNumber()];
 
-        for (int i = 0; i < nodes.length; i++) {
-            nodes[i] = new MlFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
+            // epidemic
+            for (int i = 0; i < nodes.length; i++) {
+                nodes[i] = new Epidemic(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
+                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
+            }
+
+            //spray and focus
+            //        for (int i = 0; i < nodes.length; i++) {
+            //            nodes[i] = new SprayAndFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
+            //                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
+            //        }
+
+            // mlfocus
+            //        for (int i = 0; i < nodes.length; i++) {
+            //            nodes[i] = new MlFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
+            //                    1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
+            //        }
+
+            runTrace(nodes, parser.getTraceData(), false, dissemination, seed);
+            Epidemic.writer.close();
+            Node.writer.close();
+        } catch (Exception e){
+            System.err.println(Arrays.toString(e.getStackTrace()));
+            System.err.println("Maybe you have not set TRACE and OUTPUT_WRITE variables");
         }
-
-        runTrace(nodes, parser.getTraceData(), false, dissemination, seed);
-
-
-
-
-        Epidemic.writer.close();
-        Node.writer.close();
     }
 }
