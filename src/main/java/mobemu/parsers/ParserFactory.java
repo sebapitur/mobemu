@@ -3,8 +3,6 @@ package mobemu.parsers;
 import mobemu.parsers.UPB.UpbTrace;
 import mobemu.trace.Parser;
 
-import java.util.Objects;
-
 public class ParserFactory {
 
     private ParserFactory() {
@@ -26,7 +24,7 @@ public class ParserFactory {
             return new Haggle(Haggle.HaggleTrace.CAMBRIDGE);
         } else if (type.equals("Haggle-Content")) {
             return new Haggle(Haggle.HaggleTrace.CONTENT);
-        } else if (type.equals("Haggle-Content")) {
+        } else if (type.equals("Haggle-Infocom2006")) {
             return new Haggle(Haggle.HaggleTrace.INFOCOM2006);
         }  else if (type.equals("NCCU")) {
             return new NCCU();

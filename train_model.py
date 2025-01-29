@@ -55,7 +55,7 @@ def display_metrics(y_test, y_pred, save=False):
     display_func = print
 
     if save:
-        f = open("metrics.txt", "w")
+        f = open(f"metrics-{os.environ['MODEL']}.txt", "w")
         display_func = f.write
     display_func("Number of entries trained on: " + str(5 * len(y_test)) + "\n")
     display_func(f"Accuracy: {accuracy:.2f}\n")
@@ -99,7 +99,7 @@ def train_neural(X, y):
     pmml_pipeline.fit(X_train, y_train)
 
     # Export the model to PMML
-    sklearn2pmml(pmml_pipeline, f"model-rf-{os.environ.get('DATASET')}.pmml")
+    sklearn2pmml(pmml_pipeline, f"model-neural-{os.environ.get('DATASET')}.pmml")
     display_metrics(y_test, y_pred, save=True)
 
     os.chdir(base_working_dir)
@@ -140,7 +140,7 @@ def train_svm(X, y):
     pmml_pipeline.fit(X_train, y_train)
 
     # Export the model to PMML
-    sklearn2pmml(pmml_pipeline, f"model-rf-{os.environ.get('DATASET')}.pmml")
+    sklearn2pmml(pmml_pipeline, f"model-svm-{os.environ.get('DATASET')}.pmml")
     display_metrics(y_test, y_pred, save=True)
 
     os.chdir(base_working_dir)

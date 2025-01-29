@@ -1,0 +1,15 @@
+Number of entries trained on: 3950
+Accuracy: 0.65
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.66      0.62      0.64       392
+           1       0.65      0.68      0.67       398
+
+    accuracy                           0.65       790
+   macro avg       0.65      0.65      0.65       790
+weighted avg       0.65      0.65      0.65       790
+
+Confusion Matrix:
+[[244 148]
+ [126 272]]
