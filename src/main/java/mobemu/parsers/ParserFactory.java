@@ -20,19 +20,15 @@ public class ParserFactory {
 
 
     public Parser getParser(String type) {
-        if (type.equals("GeoLife")) {
-            return new GeoLife();
-        } else if (type.equals("Haggle-Intel")) {
+        if (type.equals("Haggle-Intel")) {
             return new Haggle(Haggle.HaggleTrace.INTEL);
         } else if (type.equals("Haggle-Cambridge")) {
             return new Haggle(Haggle.HaggleTrace.CAMBRIDGE);
-        } else if (type.equals("Haggle-Infocom")) {
-            return new Haggle(Haggle.HaggleTrace.INFOCOM);
         } else if (type.equals("Haggle-Content")) {
             return new Haggle(Haggle.HaggleTrace.CONTENT);
-        } else if (type.equals("Haggle-Infocom2006")) {
+        } else if (type.equals("Haggle-Content")) {
             return new Haggle(Haggle.HaggleTrace.INFOCOM2006);
-        } else if (type.equals("NCCU")) {
+        }  else if (type.equals("NCCU")) {
             return new NCCU();
         } else if (type.equals("Sigcomm")) {
             return new Sigcomm();

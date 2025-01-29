@@ -11,3 +11,5 @@ out/
 *.class
 settings.json
 target/
+.venv/
+__pycache__/

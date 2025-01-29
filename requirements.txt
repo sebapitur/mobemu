@@ -1,0 +1,10 @@
+scikit-learn==1.5.2
+scipy
+graphviz
+shap
+matplotlib
+tensorflow
+sklearn2pmml
+setuptools
+tf2onnx
+scikeras
