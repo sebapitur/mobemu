@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Haggle-Cambridge" type="Application" factoryName="Application">
     <envs>
-      <env name="MODEL" value="svm" />
-      <env name="OUTPUT_WRITE" value="true" />
+      <env name="MODEL" value="rf-Haggle-Cambridge" />
+      <env name="ALGO" value="ML_FOCUS" />
+      <env name="OUTPUT_WRITE" value="false" />
       <env name="TRACE" value="Haggle-Cambridge" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="mobemu.MobEmu" />

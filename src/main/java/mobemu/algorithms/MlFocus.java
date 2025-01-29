@@ -6,7 +6,6 @@
 package mobemu.algorithms;
 
 import jakarta.xml.bind.JAXBException;
-import mobemu.node.ContactInfo;
 import mobemu.node.Context;
 import mobemu.node.Message;
 import mobemu.node.Node;
@@ -49,10 +48,16 @@ public class MlFocus extends Node {
                 throw new RuntimeException("Could not find model " + System.getenv("MODEL")  + " in resources");
             }
 
+            System.out.println(modelUrl);
+
             evaluator = new LoadingModelEvaluatorBuilder()
                     .load(new File(modelUrl.toURI()))
                     .build();
-        } catch (IOException | ParserConfigurationException | SAXException | JAXBException | URISyntaxException e) {
+
+
+            System.out.println("Loaded Evaluator");
+            System.out.println(evaluator);
+        } catch (IOException | ParserConfigurationException | SAXException | URISyntaxException | JAXBException e) {
             throw new RuntimeException(e);
         }
     }
@@ -162,6 +167,9 @@ public class MlFocus extends Node {
             arguments.put("newDataMemory", (float)(encounteredNode.getDataMemorySize() / this.dataMemorySize));
 
             var results = evaluator.evaluate(arguments);
+
+            System.out.println(EvaluatorUtil.decodeAll(results));
+
             int finalResult = (int)EvaluatorUtil.decodeAll(results).get(evaluator.getTargetFields().get(0).getName());
             // if the node that doesn't have the message is the better one (has met
             // the destination more recently plus delta), transfer the message

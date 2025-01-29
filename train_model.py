@@ -136,14 +136,14 @@ def train_svm(X, y):
     )
 
     base_working_dir = os.getcwd()
-    os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
     pmml_pipeline.fit(X_train, y_train)
 
     # Export the model to PMML
+    os.chdir(f"{base_working_dir}/src/main/resources")
     sklearn2pmml(pmml_pipeline, f"model-svm-{os.environ.get('DATASET')}.pmml")
-    display_metrics(y_test, y_pred, save=True)
 
-    os.chdir(base_working_dir)
+    os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
+    display_metrics(y_test, y_pred, save=True)
 
 
 def train_random_forest(X, y):
