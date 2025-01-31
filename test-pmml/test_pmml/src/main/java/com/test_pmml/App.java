@@ -35,19 +35,19 @@ public final class App {
         try {
             System.out.println("Working Directory = " + System.getProperty("user.dir"));
             Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                .load(new File("/home/seba/projects/mobemu/model-rf.pmml"))
+                .load(new File("C:/Users/seba_/mobemu/src/main/resources/model-rf-Haggle-Intel.pmml"))
                 .build();
                 // Perforing the self-check
             evaluator.verify();
 
             // Printing input (x1, x2, .., xn) fields
             List<InputField> inputFields = evaluator.getInputFields();
-            // System.out.println("Input fields: " + inputFields);
+            System.out.println("Input fields: " + inputFields);
 
             // Printing secondary result (eg. probability(y), decision(y)) fields
             List<OutputField> outputFields = evaluator.getOutputFields();
-            // System.out.println("Output fields: " + outputFields);
-            
+            System.out.println("Output fields: " + outputFields);
+
 
             Map<String, Object> arguments = new HashMap<>();
 
