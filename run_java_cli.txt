@@ -1,0 +1,10 @@
+mvn package
+
+# java must be java 10
+java -jar .\target\mobemu-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+
+$env:TRACE = "UPB2015"
+$env:ALGO = "EPIDEMIC"
+$env:OUTPUT_WRITE = "true"
+java -jar .\target\mobemu-1.0-SNAPSHOT-jar-with-dependencies.jar

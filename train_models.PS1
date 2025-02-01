@@ -8,7 +8,7 @@ $datasets = @(
 foreach ($dataset in $datasets) {
     foreach ($model in $models) {
         Start-Job -ScriptBlock {
-            cd C:\Users\seba_\mobemu\
+            cd ~\Documents\facultate\mobemu\
             .venv\Scripts\Activate.ps1
             $env:MODEL = $using:model
             $env:DATASET = $using:dataset

@@ -14,8 +14,15 @@ from sklearn.neural_network import MLPClassifier
 
 
 df = pd.read_csv(f"dataset/{os.environ.get('DATASET')}/useful_messages.csv")
+
 positive_df = df.loc[df["usefulTransfer"] == 1]
-negative_df = df.loc[df["usefulTransfer"] == 0].sample(len(positive_df))
+negative_df = df.loc[df["usefulTransfer"] == 0]
+
+lesser_len = positive_df.shape[0] if positive_df.shape[0] < negative_df.shape[0] else negative_df.shape[0]
+
+positive_df = positive_df.sample(lesser_len)
+negative_df = negative_df.sample(lesser_len)
+
 balanced_df = pd.concat([positive_df, negative_df], ignore_index=True)
 preprocessed_df = balanced_df.drop(columns="usefulTransfer").copy()
 
@@ -95,14 +102,14 @@ def train_neural(X, y):
 
     base_working_dir = os.getcwd()
 
-    os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
-    pmml_pipeline.fit(X_train, y_train)
-
     # Export the model to PMML
-    sklearn2pmml(pmml_pipeline, f"model-neural-{os.environ.get('DATASET')}.pmml")
-    display_metrics(y_test, y_pred, save=True)
+    os.chdir(f"{base_working_dir}/src/main/resources")
 
-    os.chdir(base_working_dir)
+    print(f"Saving model at {os.getcwd()}")
+    sklearn2pmml(pmml_pipeline, f"model-neural-{os.environ.get('DATASET')}.pmml")
+
+    os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
+    display_metrics(y_test, y_pred, save=True)
 
 
 def train_svm(X, y):
@@ -140,6 +147,8 @@ def train_svm(X, y):
 
     # Export the model to PMML
     os.chdir(f"{base_working_dir}/src/main/resources")
+
+    print(f"Saving model at {os.getcwd()}")
     sklearn2pmml(pmml_pipeline, f"model-svm-{os.environ.get('DATASET')}.pmml")
 
     os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
@@ -168,14 +177,16 @@ def train_random_forest(X, y):
     )
 
     base_working_dir = os.getcwd()
-    os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
     pmml_pipeline.fit(X_train, y_train)
 
     # Export the model to PMML
-    sklearn2pmml(pmml_pipeline, f"model-rf-{os.environ.get('DATASET')}.pmml")
-    display_metrics(y_test, y_pred, save=True)
+    os.chdir(f"{base_working_dir}/src/main/resources")
 
-    os.chdir(base_working_dir)
+    print(f"Saving model at {os.getcwd()}")
+    sklearn2pmml(pmml_pipeline, f"model-rf-{os.environ.get('DATASET')}.pmml")
+
+    os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
+    display_metrics(y_test, y_pred, save=True)
 
 
 if os.environ.get("MODEL") == "rf":

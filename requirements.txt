@@ -6,5 +6,3 @@ matplotlib
 tensorflow
 sklearn2pmml
 setuptools
-tf2onnx
-scikeras

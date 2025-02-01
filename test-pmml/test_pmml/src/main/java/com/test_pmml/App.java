@@ -35,7 +35,7 @@ public final class App {
         try {
             System.out.println("Working Directory = " + System.getProperty("user.dir"));
             Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                .load(new File("C:/Users/seba_/mobemu/src/main/resources/model-rf-Haggle-Intel.pmml"))
+                .load(new File("C:/Users/sebastian.pitur/Documents/facultate/mobemu/src/main/resources/model-rf-UPB2015.pmml"))
                 .build();
                 // Perforing the self-check
             evaluator.verify();
