@@ -61,7 +61,18 @@ public class MlFocus extends Node {
         
             System.out.println("Loaded Evaluator successfully");
         } catch (ParserConfigurationException | SAXException | JAXBException e) {
-            throw new RuntimeException("Failed to load PMML model: " + e.getMessage(), e);
+            URL modelUrl = MlFocus.class.getClassLoader().getResource("model-" + System.getenv("MODEL") + ".pmml");
+            if (modelUrl == null) {
+                throw new RuntimeException("Could not find model " + System.getenv("MODEL") + " in resources");
+            }
+            try {
+                evaluator = new LoadingModelEvaluatorBuilder()
+                        .load(new File(modelUrl.toURI())).build();
+            } catch (IOException | ParserConfigurationException | SAXException | JAXBException |
+                     URISyntaxException ex) {
+                throw new RuntimeException(ex);
+            }
+            System.out.println("Loaded Evaluator successfully");
         }
     }
 

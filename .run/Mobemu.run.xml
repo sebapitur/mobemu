@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Mobemu" type="Application" factoryName="Application">
     <envs>
-      <env name="MODEL" value="rf" />
+      <env name="MODEL" value="rf-UPB2011" />
       <env name="OUTPUT_WRITE" value="false" />
       <env name="TRACE" value="UPB2011" />
       <env name="ALGO" value="ML_FOCUS" />
