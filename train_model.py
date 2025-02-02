@@ -104,9 +104,10 @@ def train_neural(X, y):
 
     # Export the model to PMML
     os.chdir(f"{base_working_dir}/src/main/resources")
+    model_name = f"model-neural-{os.environ.get('DATASET')}.pmml"
+    print(f"Saving model at {os.getcwd()} with name {model_name}")
 
-    print(f"Saving model at {os.getcwd()}")
-    sklearn2pmml(pmml_pipeline, f"model-neural-{os.environ.get('DATASET')}.pmml")
+    sklearn2pmml(pmml_pipeline, model_name)
 
     os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
     display_metrics(y_test, y_pred, save=True)
@@ -147,9 +148,9 @@ def train_svm(X, y):
 
     # Export the model to PMML
     os.chdir(f"{base_working_dir}/src/main/resources")
-
-    print(f"Saving model at {os.getcwd()}")
-    sklearn2pmml(pmml_pipeline, f"model-svm-{os.environ.get('DATASET')}.pmml")
+    model_name = f"model-svm-{os.environ.get('DATASET')}.pmml"
+    print(f"Saving model at {os.getcwd()} with the name {model_name}")
+    sklearn2pmml(pmml_pipeline, model_name)
 
     os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
     display_metrics(y_test, y_pred, save=True)
@@ -181,17 +182,21 @@ def train_random_forest(X, y):
 
     # Export the model to PMML
     os.chdir(f"{base_working_dir}/src/main/resources")
+    model_name = f"model-rf-{os.environ.get('DATASET')}.pmml"
 
-    print(f"Saving model at {os.getcwd()}")
-    sklearn2pmml(pmml_pipeline, f"model-rf-{os.environ.get('DATASET')}.pmml")
+    print(f"Saving model at {os.getcwd()} with the name {model_name}")
+
+    sklearn2pmml(pmml_pipeline, model_name)
 
     os.chdir(f"{base_working_dir}/dataset/{os.environ.get('DATASET')}")
     display_metrics(y_test, y_pred, save=True)
 
-
 if os.environ.get("MODEL") == "rf":
+    print("Random forest model chosen")
     train_random_forest(X, y)
 elif os.environ.get("MODEL") == "neural":
+    print("Neural network chosen")
     train_neural(X, y)
 elif os.environ.get("MODEL") == "svm":
+    print("SVM model chosen")
     train_svm(X, y)
