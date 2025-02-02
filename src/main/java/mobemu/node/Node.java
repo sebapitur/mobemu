@@ -12,6 +12,7 @@ import java.util.*;
 import mobemu.communitydetection.KClique;
 import mobemu.trace.Contact;
 import mobemu.trace.Trace;
+import mobemu.node.Message;
 
 /**
  * Class for a mobile node in an opportunistic network. This is an abstract

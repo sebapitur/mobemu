@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.io.InputStream;
 /**
  * Class for a Spray and Focus node.
  *
@@ -42,23 +42,20 @@ public class MlFocus extends Node {
 
     static {
         try {
-            // Get path from resources
-            URL modelUrl = MlFocus.class.getClassLoader().getResource("model-" + System.getenv("MODEL") + ".pmml");
-            if (modelUrl == null) {
-                throw new RuntimeException("Could not find model " + System.getenv("MODEL")  + " in resources");
+            // Get input stream directly from the resource instead of trying to create a File
+            InputStream modelStream = MlFocus.class.getClassLoader().getResourceAsStream("model-" + System.getenv("MODEL") + "-" + System.getenv("TRACE") + ".pmml");
+            if (modelStream == null) {
+                throw new RuntimeException("Could not find model " + System.getenv("MODEL") + " for trace " + System.getenv("TRACE") + " in resources");
             }
 
-            System.out.println(modelUrl);
-
             evaluator = new LoadingModelEvaluatorBuilder()
-                    .load(new File(modelUrl.toURI()))
+                    .load(modelStream)  // Load directly from InputStream
                     .build();
 
-
-            System.out.println("Loaded Evaluator");
+            System.out.println("Loaded Evaluator successfully");
             System.out.println(evaluator);
-        } catch (IOException | ParserConfigurationException | SAXException | URISyntaxException | JAXBException e) {
-            throw new RuntimeException(e);
+        } catch (ParserConfigurationException | SAXException | JAXBException e) {
+            throw new RuntimeException("Failed to load PMML model: " + e.getMessage(), e);
         }
     }
 

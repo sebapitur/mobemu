@@ -1,9 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Haggle-Intel" type="Application" factoryName="Application">
+  <configuration default="false" name="Mobemu" type="Application" factoryName="Application">
     <envs>
-      <env name="MODEL" value="svm" />
-      <env name="OUTPUT_WRITE" value="true" />
-      <env name="TRACE" value="Haggle-Intel" />
+      <env name="MODEL" value="rf" />
+      <env name="OUTPUT_WRITE" value="false" />
+      <env name="TRACE" value="UPB2011" />
+      <env name="ALGO" value="ML_FOCUS" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="mobemu.MobEmu" />
     <module name="mobemu" />
