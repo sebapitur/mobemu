@@ -42,18 +42,24 @@ public class MlFocus extends Node {
 
     static {
         try {
-            // Get input stream directly from the resource instead of trying to create a File
-            InputStream modelStream = MlFocus.class.getClassLoader().getResourceAsStream("model-" + System.getenv("MODEL") + "-" + System.getenv("TRACE") + ".pmml");
+            String modelName = "model-" + System.getenv("MODEL") + ".pmml";
+            System.out.println("Looking for model file: " + modelName);
+            
+            // Try to load directly from the root of the JAR
+            InputStream modelStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(modelName);
+            
             if (modelStream == null) {
-                throw new RuntimeException("Could not find model " + System.getenv("MODEL") + " for trace " + System.getenv("TRACE") + " in resources");
+                System.out.println("Failed to find " + modelName + " in JAR root");
+                throw new RuntimeException("Could not find model " + modelName + " in resources");
             }
-
+        
+            System.out.println("Successfully found " + modelName);
+            
             evaluator = new LoadingModelEvaluatorBuilder()
-                    .load(modelStream)  // Load directly from InputStream
+                    .load(modelStream)
                     .build();
-
+        
             System.out.println("Loaded Evaluator successfully");
-            System.out.println(evaluator);
         } catch (ParserConfigurationException | SAXException | JAXBException e) {
             throw new RuntimeException("Failed to load PMML model: " + e.getMessage(), e);
         }
