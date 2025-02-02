@@ -86,7 +86,7 @@ def train_neural(X, y):
         alpha=1e-5,
         hidden_layer_sizes=(64, 32),
         random_state=42,
-        max_iter=500,
+        max_iter=5000,
     )
 
     # Build the pipeline
