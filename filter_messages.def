@@ -1,0 +1,26 @@
+BootStrap: docker
+From: python:3.12
+
+
+%files
+    /home/seba/mobemu/dataset /app/dataset
+    /home/seba/mobemu/filter_useful_messages_stdout.py /app/filter_useful_messages_stdout.py
+    /home/seba/mobemu/requirements.txt /app/requirements.txt
+
+# Post-installation steps (equivalent to RUN in Dockerfile)
+%post
+    # Set the working directory inside the container
+    mkdir -p /app
+    cd /app
+
+    # Install dependencies from the requirements.txt file
+    pip install --no-cache-dir -r /app/requirements.txt
+
+%environment
+    # Set environment variables if needed
+    export PYTHONPATH=/app
+
+%runscript
+    # Define the command that will run by default when the container is executed
+    exec python /app/filter_useful_messages_stdout.py
+
