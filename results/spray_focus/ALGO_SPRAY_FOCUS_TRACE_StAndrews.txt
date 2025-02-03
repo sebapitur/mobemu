@@ -1,0 +1,10 @@
+Trace duration in hours: 1781.4444444444443
+Trace contacts: 112264
+Trace contacts per hour: 63.01852429364436
+Nodes: 27
+Messages: 54675
+Spray and Focus
+HitRate 0.2704526748971193
+DeliveryCost 322.74366712391407
+DeliveryLatency 115389.78156488808
+HopCount 5.308852370325286

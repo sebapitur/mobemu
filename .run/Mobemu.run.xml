@@ -4,7 +4,7 @@
       <env name="MODEL" value="rf-UPB2011" />
       <env name="OUTPUT_WRITE" value="false" />
       <env name="TRACE" value="UPB2011" />
-      <env name="ALGO" value="ML_FOCUS" />
+      <env name="ALGO" value="EPIDEMIC" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="mobemu.MobEmu" />
     <module name="mobemu" />

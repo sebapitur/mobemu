@@ -80,7 +80,6 @@ public class MobEmu {
             } else if (System.getenv("ALGO").equals("ML_FOCUS")) {
                 nodes[i] = new MlFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
                         1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
-                System.out.println(nodes[i]);
             }
         }
 
