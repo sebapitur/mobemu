@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+
+import mobemu.MobEmu;
 import mobemu.communitydetection.KClique;
 import mobemu.trace.Contact;
 import mobemu.trace.Trace;
@@ -1000,5 +1002,22 @@ public abstract class Node {
                 localCentrality.setValue(Centrality.CentralityValue.CUMULATED, localCentrality.getValue(Centrality.CentralityValue.CURRENT));
             }
         }
+    }
+
+
+    protected Long getMaxEncounterTimeWithTopic(Message message, long currentTime) {
+        long timeDestinationSeen = Long.MIN_VALUE;
+
+        for (var node: encounteredNodes.keySet()) {
+            Context context = MobEmu.nodes[node].getContext();
+
+            if (context.getCommonTopics(message.getTags(), currentTime) > 0) {
+                if (encounteredNodes.get(node).getLastEncounterTime() > timeDestinationSeen) {
+                    timeDestinationSeen = encounteredNodes.get(node).getLastEncounterTime();
+                }
+            }
+        }
+
+        return timeDestinationSeen;
     }
 }

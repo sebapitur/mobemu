@@ -5,12 +5,10 @@
  */
 package mobemu.algorithms;
 
-import java.util.ArrayList;
-import java.util.List;
-import mobemu.node.ContactInfo;
-import mobemu.node.Context;
-import mobemu.node.Message;
-import mobemu.node.Node;
+import java.util.*;
+
+import mobemu.MobEmu;
+import mobemu.node.*;
 
 /**
  * Class for a Spray and Focus node.
@@ -26,6 +24,7 @@ import mobemu.node.Node;
 public class SprayAndFocus extends Node {
 
     private final boolean altruismAnalysis;
+    private boolean dissemination;
     private final long delta;
 
     /**
@@ -50,8 +49,9 @@ public class SprayAndFocus extends Node {
      * {@code false} otherwise
      */
     public SprayAndFocus(int id, int nodes, Context context, boolean[] socialNetwork, int dataMemorySize, int exchangeHistorySize,
-            long seed, long traceStart, long traceEnd, boolean altruism) {
+            long seed, long traceStart, long traceEnd, boolean dissemination, boolean altruism) {
         this(id, nodes, context, socialNetwork, dataMemorySize, exchangeHistorySize, seed, traceStart, traceEnd, altruism, DEFAULT_DELTA);
+        this.dissemination = dissemination;
     }
 
     /**
@@ -92,7 +92,7 @@ public class SprayAndFocus extends Node {
         }
 
         SprayAndFocus sprayAndFocusEncounteredNode = (SprayAndFocus) encounteredNode;
-        int remainingMessages = deliverDirectMessages(sprayAndFocusEncounteredNode, altruismAnalysis, contactDuration, currentTime, false);
+        int remainingMessages = deliverDirectMessages(sprayAndFocusEncounteredNode, altruismAnalysis, contactDuration, currentTime, dissemination);
         int totalMessages = 0;
         List<Message> toRemove = new ArrayList<>();
 
@@ -102,11 +102,11 @@ public class SprayAndFocus extends Node {
                 return;
             }
 
-            if (!runSprayAndFocus(message, sprayAndFocusEncounteredNode, toRemove)) {
+            if (!runSprayAndFocus(message, sprayAndFocusEncounteredNode, toRemove, currentTime)) {
                 continue;
             }
 
-            if (insertMessage(message, sprayAndFocusEncounteredNode, currentTime, altruismAnalysis, false)) {
+            if (insertMessage(message, sprayAndFocusEncounteredNode, currentTime, altruismAnalysis, dissemination)) {
                 totalMessages++;
             }
         }
@@ -122,11 +122,11 @@ public class SprayAndFocus extends Node {
                 return;
             }
 
-            if (!runSprayAndFocus(message, sprayAndFocusEncounteredNode, toRemove)) {
+            if (!runSprayAndFocus(message, sprayAndFocusEncounteredNode, toRemove, currentTime)) {
                 continue;
             }
 
-            if (insertMessage(message, sprayAndFocusEncounteredNode, currentTime, altruismAnalysis, false)) {
+            if (insertMessage(message, sprayAndFocusEncounteredNode, currentTime, altruismAnalysis, dissemination)) {
                 totalMessages++;
             }
         }
@@ -145,21 +145,32 @@ public class SprayAndFocus extends Node {
      * @return {@code true} if the message should be copied, {@code false}
      * otherwise
      */
-    private boolean runSprayAndFocus(Message message, SprayAndFocus encounteredNode, List<Message> toRemove) {
+    private boolean runSprayAndFocus(Message message, SprayAndFocus encounteredNode, List<Message> toRemove, long currentTime) {
         // if a single message copy is left, perform the Focus phase
         if (message.getCopies(encounteredNode.id) == 1) {
             // compute the last time each of the two nodes encountered the message's destination
             long timeDestinationSeen = Long.MIN_VALUE;
             long timeDestinationSeenEncountered = Long.MIN_VALUE;
 
-            ContactInfo info = encounteredNodes.get(message.getDestination());
-            if (info != null) {
-                timeDestinationSeen = info.getLastEncounterTime();
+            if (!dissemination) {
+                ContactInfo info = encounteredNodes.get(message.getDestination());
+
+                if (info != null) {
+                    timeDestinationSeen = info.getLastEncounterTime();
+                }
+            } else {
+                timeDestinationSeen = this.getMaxEncounterTimeWithTopic(message, currentTime);
             }
 
-            info = encounteredNode.encounteredNodes.get(message.getDestination());
-            if (info != null) {
-                timeDestinationSeenEncountered = info.getLastEncounterTime();
+
+            if (!dissemination) {
+                ContactInfo info = encounteredNode.encounteredNodes.get(message.getDestination());
+
+                if (info != null) {
+                    timeDestinationSeenEncountered = info.getLastEncounterTime();
+                }
+            } else {
+                timeDestinationSeenEncountered = encounteredNode.getMaxEncounterTimeWithTopic(message, currentTime);
             }
 
             // if the node that doesn't have the message is the better one (has met

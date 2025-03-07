@@ -25,6 +25,9 @@ import mobemu.parsers.ParserFactory;
 
 public class MobEmu {
 
+
+
+    public static Node[] nodes;
     private static String filename = "ALGO_" + System.getenv("ALGO") + "_TRACE_" + System.getenv("TRACE") + "_MODEL_" + System.getenv("MODEL");
 
     private static void runTrace(Node[] nodes, Trace traceData, boolean batteryComputation, boolean dissemination, long seed) {
@@ -65,8 +68,8 @@ public class MobEmu {
 
         // initialize Epidemic nodes
         long seed = 0;
-        boolean dissemination = false;
-        Node[] nodes = new Node[parser.getNodesNumber()];
+        boolean dissemination = System.getenv("DISSEMINATION").equals("true");
+        nodes = new Node[parser.getNodesNumber()];
 
 
         // epidemic
@@ -76,7 +79,7 @@ public class MobEmu {
                         1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
             } else if (System.getenv("ALGO").equals("SPRAY_FOCUS")) {
                 nodes[i] = new SprayAndFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
+                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
             } else if (System.getenv("ALGO").equals("ML_FOCUS")) {
                 nodes[i] = new MlFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
                         1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);

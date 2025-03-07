@@ -38,6 +38,9 @@ import java.io.InputStream;
 public class MlFocus extends Node {
 
     private final boolean altruismAnalysis;
+
+    private boolean dissemination;
+
     private static Evaluator evaluator;
 
     static {
