@@ -2,13 +2,18 @@ import os
 import pandas as pd
 import numpy as np
 
-sent_messages_file = f"dataset/{os.environ.get('DATASET')}/sent_messages.csv"
+sent_messages_file = f"dataset/{os.environ.get('DATASET')}/sent_messages"
+
+if os.environ['DISSEMINATION'] and os.environ['DISSEMINATION'] == 'true':
+    sent_messages_file += "_dissemination"
+sent_messages_file += ".csv"
+
 file_size = os.path.getsize(sent_messages_file)
 
 # if sent file is larger than 3GB
 if file_size >  3 * 1024 * 1024 * 1024:
     sent_messages = pd.read_csv(
-        sent_messages_file, nrows=10000000
+        sent_messages_file, nrows=10000000, engine="python"
     )
 else:
     sent_messages = pd.read_csv(
@@ -18,16 +23,20 @@ else:
 
 print(f"sent_messages columns: {sent_messages.columns}")
 
-successful_messages_file =  f"dataset/{os.environ.get('DATASET')}/successful.csv"
+successful_messages_file =  f"dataset/{os.environ.get('DATASET')}/successful"
 
+if os.environ['DISSEMINATION'] and os.environ['DISSEMINATION'] == 'true':
+    successful_messages_file += "_dissemination"
+
+successful_messages_file += ".csv"
 # if successful file is larger than 8Mb
 if file_size > 8 * 1024 * 1024:
     successful_messages = pd.read_csv(
-        f"dataset/{os.environ.get('DATASET')}/successful.csv", nrows=200000
+        successful_messages_file, nrows=200000, engine="python"
     )
 else:
     successful_messages = pd.read_csv(
-        f"dataset/{os.environ.get('DATASET')}/successful.csv"
+        successful_messages_file, engine="python"
     )
 
 print(f"successful messages columns: {successful_messages.columns}")
@@ -111,7 +120,12 @@ print(
     f"Number of useful transfers: {sent_messages['usefulTransfer'].value_counts()[1]}"
 )
 
-csv_file_location = f"dataset/{os.environ.get('DATASET')}/useful_messages.csv"
+csv_file_location = f"dataset/{os.environ.get('DATASET')}/useful_messages"
+
+if os.environ['DISSEMINATION'] and os.environ['DISSEMINATION'] == 'true':
+     csv_file_location += "_dissemination"
+
+csv_file_location += ".csv"
 
 print(f"useful messages columns: {sent_messages.columns}")
 print(f"Current working dir: {os.getcwd()}")

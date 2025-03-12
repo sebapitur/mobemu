@@ -29,8 +29,16 @@ public abstract class Node {
     static {
         try {
             // String filename = "traces/upb-hyccups2012/successful2012.csv";
-            String filename = "dataset/" + System.getenv("TRACE") + "/successful.csv";
+            String filename = "dataset/" + System.getenv("TRACE") + "/successful";
+
+            if (System.getenv("DISSEMINATION") != null && System.getenv("DISSEMINATION").equals("true")) {
+                filename += "_dissemination";
+            }
+
+            filename += ".csv";
+
             writer = new PrintWriter(new FileWriter(filename));
+
             if (outputWriteCondition)
                 writer.println("messageId,lastRelay,destination");
         } catch (IOException e) {

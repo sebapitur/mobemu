@@ -23,10 +23,16 @@ import java.text.DecimalFormat;
  */
 public class Epidemic extends Node {
     public static PrintWriter writer;
-    public static Boolean outputWriteCondition = System.getenv("OUTPUT_WRITE").equals("true");;
+    public static Boolean outputWriteCondition = System.getenv("OUTPUT_WRITE").equals("true");
     static {
-        // String filename = "traces/upb-hyccups2012/upb2012.csv";
-        String filename = "dataset/" + System.getenv("TRACE") + "/sent_messages.csv";
+        String filename = "dataset/" + System.getenv("TRACE") + "/sent_messages";
+
+        if (System.getenv("DISSEMINATION") != null && System.getenv("DISSEMINATION").equals("true")) {
+            filename += "_dissemination";
+        }
+
+        filename += ".csv";
+
         try {
             writer = new PrintWriter(new FileWriter(filename));
             if (outputWriteCondition)
@@ -97,8 +103,19 @@ public class Epidemic extends Node {
             String messageHopCount = "" + message.getHopCount(message.getDestination());
             String oldRelayId = "" + epidemicEncounteredNode.id;
             String newRelayId = "" + this.id;
-            Integer oldFriendWithDestination = epidemicEncounteredNode.socialNetwork[message.getDestination()] ? 1 : 0;
-            Integer newFriendWithDestination = this.socialNetwork[message.getDestination()] ? 1 : 0;
+
+            Integer oldFriendWithDestination = 0;
+            Integer newFriendWithDestination = 0;
+
+            if (message.getDestination() == -1) {
+                // in the case of dissemination this feature is have topic in common with the message
+                oldFriendWithDestination = epidemicEncounteredNode.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
+                newFriendWithDestination = this.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
+            } else {
+                oldFriendWithDestination = epidemicEncounteredNode.socialNetwork[message.getDestination()] ? 1 : 0;
+                newFriendWithDestination = this.socialNetwork[message.getDestination()] ? 1 : 0;
+            }
+
             String oldRelayBattery = "" + epidemicEncounteredNode.getBattery().getPercentage();
             String newRelayBattery = "" + this.getBattery().getPercentage();
             // removed centrality for the moment because it is almost 0

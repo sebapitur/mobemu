@@ -28,9 +28,19 @@ public class MobEmu {
 
 
     public static Node[] nodes;
-    private static String filename = "ALGO_" + System.getenv("ALGO") + "_TRACE_" + System.getenv("TRACE") + "_MODEL_" + System.getenv("MODEL");
+    private static String filename = "ALGO_" + System.getenv("ALGO") + "_TRACE_" + System.getenv("TRACE");
 
+    static {
+        if (System.getenv("MODEL") != null && !System.getenv("MODEL").isEmpty()) {
+            filename += "_MODEL_" + System.getenv("MODEL");
+        }
+
+        if (System.getenv("DISSEMINATION") != null && System.getenv("DISSEMINATION").equals("true")) {
+            filename += "_DISSEMINATION";
+        }
+    }
     private static void runTrace(Node[] nodes, Trace traceData, boolean batteryComputation, boolean dissemination, long seed) {
+
         List<Message> messages = Node.runTrace(nodes, traceData, batteryComputation, dissemination, seed);
 
         try (FileWriter resultFile = new FileWriter(filename, true)) {
@@ -68,7 +78,7 @@ public class MobEmu {
 
         // initialize Epidemic nodes
         long seed = 0;
-        boolean dissemination = System.getenv("DISSEMINATION").equals("true");
+        boolean dissemination = System.getenv("DISSEMINATION") != null ? System.getenv("DISSEMINATION").equals("true") :  false;
         nodes = new Node[parser.getNodesNumber()];
 
 
