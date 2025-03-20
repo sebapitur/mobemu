@@ -44,7 +44,7 @@ public class Haggle implements Parser {
                 String prefix = "traces" + File.separator + "cambridge-haggle-imote-intel" + File.separator;
                 this.trace = new Trace("Haggle Intel");
                 this.socialNetwork = new boolean[9][9];
-                parseHaggle(prefix + "contacts.Exp1.dat", prefix + "table.Exp1.dat", prefix + "MAC3BTable.Exp1.dat", 9);
+                parseHaggle(prefix + "contacts.Exp1.dat", prefix + "table.Exp1.dat", prefix + "MAC3Btable.Exp1.dat", 9);
                 break;
             }
             case CAMBRIDGE: {

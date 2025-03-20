@@ -1,10 +1,12 @@
 #!/bin/bash
 
 # Define datasets
-datasets=("UPB2011" "UPB2012" "UPB2015" "Haggle-Intel" "Haggle-Cambridge" "Haggle-Content" "Haggle-Infocom2006" "NCCU" "Sigcomm" "SocialBlueConn" "StAndrews")
+
+# datasets=("UPB2011" "UPB2012" "UPB2015" "Haggle-Intel" "Haggle-Cambridge" "Haggle-Content" "Haggle-Infocom2006" "NCCU" "Sigcomm" "SocialBlueConn" "StAndrews")
+datasets=("UPB2012" "Sigcomm" "SocialBlueConn")
 
 # Get the number of available CPU cores
-MAX_PROCS=4
+MAX_PROCS=1
 echo "Using up to $MAX_PROCS parallel processes..."
 
 # Initialize process counter
