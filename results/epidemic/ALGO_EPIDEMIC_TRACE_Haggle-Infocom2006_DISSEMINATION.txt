@@ -1,0 +1,10 @@
+Trace duration in hours: 93.72722222222222
+Trace contacts: 170601
+Trace contacts per hour: 1820.1862378414903
+Nodes: 99
+Messages: 31185
+Epidemic
+HitRate 0.7480548213087179
+DeliveryCost 315.5169970086922
+DeliveryLatency 19569.745894602755
+HopCount 805.6401373542687

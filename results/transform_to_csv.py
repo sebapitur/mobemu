@@ -68,12 +68,17 @@ def parse_filename(filename):
     algo = re.search(r'ALGO_(.*)_TRACE', filename).group(1) if re.search(r'ALGO_(.*)_TRACE', filename) else None
 
     # Extract dataset part (between TRACE_ and _MODEL or .txt)
-    dataset = re.search(r'TRACE_(.*?)(?:_MODEL|\.txt)', filename).group(1) if re.search(r'TRACE_(.*)(?:_MODEL|\.txt)', filename) else None
+    dataset = re.search(r'TRACE_(.*?)(?:_MODEL|\.txt|_DATASET)', filename).group(1) if re.search(r'TRACE_(.*)(?:_MODEL|\.txt)', filename) else None
 
     # Extract model info (between MODEL_ and .txt) if it exists
-    model_info = re.search(r'MODEL_(.*)\.txt', filename).group(1) if re.search(r'MODEL_(.*?)\.txt', filename) else None
+    model_info = re.search(r'MODEL_(.*)[._]txt', filename).group(1) if re.search(r'MODEL_(.*?)\.txt', filename) else None
 
-    return dataset, algo, model_info
+    dissemination = False
+
+    if "DISSEMINATION" in filename:
+        dissemination = True
+
+    return dataset, algo, model_info, dissemination
 
 
 def main():
@@ -85,7 +90,7 @@ def main():
 
     # Process each file
     for file in files:
-        dataset, algo, model_info = parse_filename(file)
+        dataset, algo, model_info, dissemination = parse_filename(file)
         if dataset and algo:
             metrics = extract_metrics(os.path.join(sys.argv[1], file))
             row_data = {
@@ -93,6 +98,7 @@ def main():
                 'algo': algo,
                 'model_info': model_info if model_info else "not_relevant",
                 'filename': file,
+                'dissemination': dissemination,
                 **metrics
             }
             data.append(row_data)
@@ -101,9 +107,8 @@ def main():
     df = pd.DataFrame(data)
 
     # Reorder columns for better readability
-    columns_order = ['dataset', 'model_info', 'algo', 'trace_duration', 'contacts',
-                    'contacts_per_hour', 'nodes', 'messages', 'hit_rate', 'delivery_cost',
-                    'delivery_latency', 'hop_count']
+    columns_order = ['dataset', 'model_info', 'algo', 'dissemination', 'trace_duration',    'contacts','contacts_per_hour', 'nodes', 'messages',
+                      'hit_rate', 'delivery_cost', 'delivery_latency', 'hop_count']
     df = df[columns_order]
 
     # Save to CSV

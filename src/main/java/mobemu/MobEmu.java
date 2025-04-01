@@ -81,6 +81,7 @@ public class MobEmu {
         boolean dissemination = System.getenv("DISSEMINATION") != null ? System.getenv("DISSEMINATION").equals("true") :  false;
         nodes = new Node[parser.getNodesNumber()];
 
+        System.out.println("DISSEMINATION is " + dissemination);
 
         // epidemic
         for (int i = 0; i < nodes.length; i++) {
@@ -92,7 +93,7 @@ public class MobEmu {
                         1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), dissemination, false);
             } else if (System.getenv("ALGO").equals("ML_FOCUS")) {
                 nodes[i] = new MlFocus(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
+                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false, dissemination);
             }
         }
 

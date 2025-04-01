@@ -11,9 +11,18 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
+from typing import List, Tuple, Union
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder
+
+dataset_filename = f"dataset/{os.environ.get('DATASET')}/useful_messages"
+
+if os.environ.get('DISSEMINATION') == 'true':
+    dataset_filename += "_dissemination"
+
+dataset_filename += '.csv'
 
 
-df = pd.read_csv(f"dataset/{os.environ.get('DATASET')}/useful_messages.csv")
+df = pd.read_csv(dataset_filename)
 
 positive_df = df.loc[df["usefulTransfer"] == 1]
 negative_df = df.loc[df["usefulTransfer"] == 0]
@@ -40,12 +49,22 @@ standard_columns = [
     if col not in minmax_columns and col not in categorial_columns
 ]
 
-preprocessor = ColumnTransformer(
-    transformers=[
+TransformerType = Union[MinMaxScaler, StandardScaler, OneHotEncoder]
+
+transformers: List[Tuple[str, TransformerType, List[str]]] = []
+
+if os.environ.get("DISSEMINATION") != "true":
+    transformers = [
         ("minmax", MinMaxScaler((0, 1)), minmax_columns),
+    ]
+
+transformers.extend([
         ("standard", StandardScaler(), standard_columns),
-        ("onehotencoder", OneHotEncoder(), categorial_columns),
-    ],
+        ("onehotencoder", OneHotEncoder(), categorial_columns)
+    ])
+
+preprocessor = ColumnTransformer(
+    transformers=transformers,
     remainder="passthrough",
 )
 
@@ -104,7 +123,13 @@ def train_neural(X, y):
 
     # Export the model to PMML
     os.chdir(f"{base_working_dir}/src/main/resources")
-    model_name = f"model-neural-{os.environ.get('DATASET')}.pmml"
+    model_name = f"model-neural-{os.environ.get('DATASET')}"
+
+    if os.environ.get('DISSEMINATION') == 'true':
+        model_name += "_dissemination"
+
+    model_name += ".pmml"
+
     print(f"Saving model at {os.getcwd()} with name {model_name}")
 
     sklearn2pmml(pmml_pipeline, model_name)
@@ -148,7 +173,13 @@ def train_svm(X, y):
 
     # Export the model to PMML
     os.chdir(f"{base_working_dir}/src/main/resources")
-    model_name = f"model-svm-{os.environ.get('DATASET')}.pmml"
+    model_name = f"model-svm-{os.environ.get('DATASET')}"
+
+    if os.environ.get('DISSEMINATION') == 'true':
+        model_name += "_dissemination"
+
+    model_name += ".pmml"
+
     print(f"Saving model at {os.getcwd()} with the name {model_name}")
     sklearn2pmml(pmml_pipeline, model_name)
 
@@ -182,7 +213,12 @@ def train_random_forest(X, y):
 
     # Export the model to PMML
     os.chdir(f"{base_working_dir}/src/main/resources")
-    model_name = f"model-rf-{os.environ.get('DATASET')}.pmml"
+    model_name = f"model-rf-{os.environ.get('DATASET')}"
+
+    if os.environ.get('DISSEMINATION') == 'true':
+        model_name += "_dissemination"
+
+    model_name += ".pmml"
 
     print(f"Saving model at {os.getcwd()} with the name {model_name}")
 

@@ -45,23 +45,29 @@ public class MlFocus extends Node {
 
     static {
         try {
-            String modelName = "model-" + System.getenv("MODEL") + ".pmml";
+            String modelName = "model-" + System.getenv("MODEL") ;
+
+            if (System.getenv("DISSEMINATION").equals("true")) {
+                modelName += "_dissemination";
+            }
+
+            modelName += ".pmml";
             System.out.println("Looking for model file: " + modelName);
-            
+
             // Try to load directly from the root of the JAR
             InputStream modelStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(modelName);
-            
+
             if (modelStream == null) {
                 System.out.println("Failed to find " + modelName + " in JAR root");
                 throw new RuntimeException("Could not find model " + modelName + " in resources");
             }
-        
+
             System.out.println("Successfully found " + modelName);
-            
+
             evaluator = new LoadingModelEvaluatorBuilder()
                     .load(modelStream)
                     .build();
-        
+
             System.out.println("Loaded Evaluator successfully");
         } catch (ParserConfigurationException | SAXException | JAXBException e) {
             URL modelUrl = MlFocus.class.getClassLoader().getResource("model-" + System.getenv("MODEL") + ".pmml");
@@ -96,9 +102,10 @@ public class MlFocus extends Node {
      * {@code false} otherwise
      */
     public MlFocus(int id, int nodes, Context context, boolean[] socialNetwork, int dataMemorySize, int exchangeHistorySize,
-                   long seed, long traceStart, long traceEnd, boolean altruism) {
+                   long seed, long traceStart, long traceEnd, boolean altruism, boolean dissemination) {
         super(id, nodes, context, socialNetwork, dataMemorySize, exchangeHistorySize, seed, traceStart, traceEnd);
         this.altruismAnalysis = altruism;
+        this.dissemination = true;
     }
 
 
@@ -114,7 +121,7 @@ public class MlFocus extends Node {
         }
 
         MlFocus mlFocusEncounteredNode = (MlFocus) encounteredNode;
-        int remainingMessages = deliverDirectMessages(mlFocusEncounteredNode, altruismAnalysis, contactDuration, currentTime, false);
+        int remainingMessages = deliverDirectMessages(mlFocusEncounteredNode, altruismAnalysis, contactDuration, currentTime, dissemination);
         int totalMessages = 0;
         List<Message> toRemove = new ArrayList<>();
 
@@ -124,15 +131,15 @@ public class MlFocus extends Node {
                 return;
             }
 
-            if (!runMlfocus(message, mlFocusEncounteredNode, toRemove)) {
+            if (!runMlfocus(message, mlFocusEncounteredNode, toRemove, currentTime)) {
                 continue;
             }
 
-            if (insertMessage(message, mlFocusEncounteredNode, currentTime, altruismAnalysis, false)) {
+            if (insertMessage(message, mlFocusEncounteredNode, currentTime, altruismAnalysis, dissemination)) {
                 totalMessages++;
             }
         }
-        
+
         for (Message message : toRemove) {
             mlFocusEncounteredNode.removeMessage(message, true);
         }
@@ -144,15 +151,15 @@ public class MlFocus extends Node {
                 return;
             }
 
-            if (!runMlfocus(message, mlFocusEncounteredNode, toRemove)) {
+            if (!runMlfocus(message, mlFocusEncounteredNode, toRemove, currentTime)) {
                 continue;
             }
 
-            if (insertMessage(message, mlFocusEncounteredNode, currentTime, altruismAnalysis, false)) {
+            if (insertMessage(message, mlFocusEncounteredNode, currentTime, altruismAnalysis, dissemination)) {
                 totalMessages++;
             }
         }
-        
+
         for (Message message : toRemove) {
             mlFocusEncounteredNode.removeMessage(message, false);
         }
@@ -167,18 +174,30 @@ public class MlFocus extends Node {
      * @return {@code true} if the message should be copied, {@code false}
      * otherwise
      */
-    private boolean runMlfocus(Message message, MlFocus encounteredNode, List<Message> toRemove) {
+    private boolean runMlfocus(Message message, MlFocus encounteredNode, List<Message> toRemove, long currentTime) {
         // if a single message copy is left, perform the Focus phase
         if (message.getCopies(encounteredNode.id) == 1) {
             // run the ML algorithm to find out if the encountered node is a better relay than the current
             Map<String, Object> arguments = new HashMap<>();
 
-            arguments.put("messageHopCount", message.getHopCount(message.getDestination()));
-            arguments.put("oldFriendWithDestination", this.socialNetwork[message.getDestination()]);
+            if (!this.dissemination) {
+                arguments.put("messageHopCount", message.getHopCount(message.getDestination()));
+            }
+
+            if (message.getDestination() == -1) {
+                Integer oldFriendWithDestination = this.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
+                Integer newFriendWithDestination = encounteredNode.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
+
+                arguments.put("newFriendWithDestination", newFriendWithDestination);
+                arguments.put("oldFriendWithDestination", oldFriendWithDestination);
+            } else {
+                arguments.put("newFriendWithDestination", encounteredNode.socialNetwork[message.getDestination()]);
+                arguments.put("oldFriendWithDestination", this.socialNetwork[message.getDestination()]);
+            }
             arguments.put("oldRelayBattery", this.getBattery().getPercentage());
             arguments.put("oldCommonCommunity", this.inLocalCommunity(message.getDestination()));
             arguments.put("oldDataMemory", (float)(this.getDataMemorySize() / this.dataMemorySize));
-            arguments.put("newFriendWithDestination", encounteredNode.socialNetwork[message.getDestination()]);
+
             arguments.put("newRelayBattery", encounteredNode.getBattery().getPercentage());
             arguments.put("newCommonCommunity", encounteredNode.inLocalCommunity(message.getDestination()));
             arguments.put("newDataMemory", (float)(encounteredNode.getDataMemorySize() / this.dataMemorySize));
