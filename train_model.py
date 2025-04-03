@@ -81,6 +81,12 @@ def display_metrics(y_test, y_pred, save=False):
     display_func = print
 
     if save:
+        filename = f"metrics-{os.environ['MODEL']}"
+        
+        if "DISSEMINATION" in os.environ and os.environ["DISSEMINATION"] == 'true':
+            filename += "-dissemination"
+
+        filename += ".txt"
         f = open(f"metrics-{os.environ['MODEL']}.txt", "w")
         display_func = f.write
     display_func("Number of entries trained on: " + str(5 * len(y_test)) + "\n")

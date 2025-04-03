@@ -2,9 +2,14 @@
 
 # models=("neural" "rf" "svm")
 models=("neural" "svm", "rf")
+
 datasets=("UPB2011" "UPB2012" "UPB2015"
            "Haggle-Cambridge" "Haggle-Content" "Haggle-Infocom2006" "Haggle-Intel"
            "NCCU" "Sigcomm" "SocialBlueConn" "StAndrews")
+
+if [[ "$DISSEMINATION" == "true" ]]; then
+    datasets=("UPB2012" "Haggle-Infocom2006" "SocialBlueConn" "Sigcomm")
+fi
 
 # Maximum number of parallel processes
 MAX_PROCS=4
@@ -24,7 +29,6 @@ for dataset in "${datasets[@]}"; do
             source .venv/bin/activate
             export MODEL="$model"
             export DATASET="$dataset"
-            export DISSEMINATION="true"
             python train_model.py
         ) &
     done
