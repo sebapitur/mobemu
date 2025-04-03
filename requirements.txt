@@ -6,3 +6,4 @@ matplotlib
 tensorflow
 sklearn2pmml
 setuptools
+tabulate
