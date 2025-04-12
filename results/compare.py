@@ -125,6 +125,7 @@ if all_comparisons:
 
     print("Instances where ML_FOCUS performs better:")
     print(final_results)
-    final_results.to_csv('comparison.csv')
+    filename = "comparison_dissemination.csv" if filter else "comparison_routing.csv"
+    final_results.to_csv(filename)
 else:
     print("No instances found where ML_FOCUS performs better")
