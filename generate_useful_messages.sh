@@ -2,8 +2,13 @@
 
 # Define datasets
 
-# datasets=("UPB2011" "UPB2012" "UPB2015" "Haggle-Intel" "Haggle-Cambridge" "Haggle-Content" "Haggle-Infocom2006" "NCCU" "Sigcomm" "SocialBlueConn" "StAndrews")
-datasets=("UPB2012" "Sigcomm" "SocialBlueConn")
+datasets=("UPB2011" "UPB2012" "UPB2015"
+           "Haggle-Cambridge" "Haggle-Content" "Haggle-Infocom2006" "Haggle-Intel"
+           "NCCU" "Sigcomm" "SocialBlueConn" "StAndrews")
+
+if [[ "$DISSEMINATION" == "true" ]]; then
+    datasets=("UPB2012" "Haggle-Infocom2006" "SocialBlueConn" "Sigcomm")
+fi
 
 # Get the number of available CPU cores
 MAX_PROCS=1

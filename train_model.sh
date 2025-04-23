@@ -25,8 +25,8 @@ for dataset in "${datasets[@]}"; do
     for model in "${models[@]}"; do
         wait_for_jobs  # Ensure we don't exceed MAX_PROCS
         (
-            cd ~/mobemu/ || exit
-            source .venv/bin/activate
+            source .venv/Scripts/activate
+            # source .venv/bin/activate
             export MODEL="$model"
             export DATASET="$dataset"
             python train_model.py

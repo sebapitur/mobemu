@@ -4,7 +4,6 @@
  */
 package mobemu.node;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,7 +13,6 @@ import mobemu.MobEmu;
 import mobemu.communitydetection.KClique;
 import mobemu.trace.Contact;
 import mobemu.trace.Trace;
-import mobemu.node.Message;
 
 /**
  * Class for a mobile node in an opportunistic network. This is an abstract
@@ -1027,5 +1025,38 @@ public abstract class Node {
         }
 
         return timeDestinationSeen;
+    }
+
+
+    private Integer getNumberOfInterestedNodes(Set<Topic> topics, List<Integer> nodesIndexes, long currentTime) {
+        Integer interested = 0;
+
+        for (int i = 0; i < nodesIndexes.size(); i++) {
+            var currentNode = MobEmu.nodes[nodesIndexes.get(i)];
+            for (var topic: topics) {
+                if (currentNode.getContext().isTopicCommon(topic, currentTime)) {
+                    interested++;
+                    break;
+                }
+            }
+        }
+
+        return interested;
+    }
+
+    public Integer getNumberOfFriendsInterestedInTopic(Set<Topic> topics, long currentTime) {
+        List<Integer> nodeIndexesToBeChecked = new LinkedList<>();
+        for (int i = 0; i < this.socialNetwork.length; i++) {
+            if (this.socialNetwork[i]) {
+                nodeIndexesToBeChecked.add(i);
+            }
+        }
+
+        return this.getNumberOfInterestedNodes(topics, nodeIndexesToBeChecked, currentTime);
+    }
+
+
+    public Integer getSameCommunityNodesInterestedInTopic(Set<Topic> topics, long currentTime) {
+        return this.getNumberOfInterestedNodes(topics, this.getLocalCommunity(), currentTime);
     }
 }

@@ -184,22 +184,33 @@ public class MlFocus extends Node {
                 arguments.put("messageHopCount", message.getHopCount(message.getDestination()));
             }
 
-            if (message.getDestination() == -1) {
-                Integer oldFriendWithDestination = this.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
-                Integer newFriendWithDestination = encounteredNode.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
+            Integer oldFriendWithDestination = 0;
+            Integer newFriendWithDestination = 0;
+            Integer oldCommonCommunity = 0;
+            Integer newCommonCommunity = 0;
 
-                arguments.put("newFriendWithDestination", newFriendWithDestination);
-                arguments.put("oldFriendWithDestination", oldFriendWithDestination);
+            // for the dissemination case the variable is not what the name says :)
+            if (message.getDestination() == -1) {
+                oldFriendWithDestination = this.getNumberOfFriendsInterestedInTopic(message.getTags().getTopics(), currentTime);
+                newFriendWithDestination = encounteredNode.getNumberOfFriendsInterestedInTopic(message.getTags().getTopics(), currentTime);
+                oldCommonCommunity = this.getSameCommunityNodesInterestedInTopic(message.getTags().getTopics(), currentTime);
+                newCommonCommunity = encounteredNode.getSameCommunityNodesInterestedInTopic(message.getTags().getTopics(), currentTime);
             } else {
-                arguments.put("newFriendWithDestination", encounteredNode.socialNetwork[message.getDestination()]);
-                arguments.put("oldFriendWithDestination", this.socialNetwork[message.getDestination()]);
+                newFriendWithDestination = encounteredNode.socialNetwork[message.getDestination()]  ? 1 : 0;
+                oldFriendWithDestination = this.socialNetwork[message.getDestination()] ? 1 : 0;
+                oldCommonCommunity = this.inLocalCommunity(message.getDestination()) ? 1 : 0;
+                newCommonCommunity = encounteredNode.inLocalCommunity(message.getDestination()) ? 1 : 0;
             }
+
+            arguments.put("newFriendWithDestination", newFriendWithDestination);
+            arguments.put("oldFriendWithDestination", oldFriendWithDestination);
+            arguments.put("newCommonCommunity", newCommonCommunity);
+            arguments.put("oldCommonCommunity", oldCommonCommunity);
+
             arguments.put("oldRelayBattery", this.getBattery().getPercentage());
-            arguments.put("oldCommonCommunity", this.inLocalCommunity(message.getDestination()));
             arguments.put("oldDataMemory", (float)(this.getDataMemorySize() / this.dataMemorySize));
 
             arguments.put("newRelayBattery", encounteredNode.getBattery().getPercentage());
-            arguments.put("newCommonCommunity", encounteredNode.inLocalCommunity(message.getDestination()));
             arguments.put("newDataMemory", (float)(encounteredNode.getDataMemorySize() / this.dataMemorySize));
 
             var results = evaluator.evaluate(arguments);

@@ -106,14 +106,20 @@ public class Epidemic extends Node {
 
             Integer oldFriendWithDestination = 0;
             Integer newFriendWithDestination = 0;
+            Integer oldCommonCommunity = 0;
+            Integer newCommonCommunity = 0;
 
             if (message.getDestination() == -1) {
                 // in the case of dissemination this feature is have topic in common with the message
-                oldFriendWithDestination = epidemicEncounteredNode.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
-                newFriendWithDestination = this.getContext().getCommonTopics(message.getTags(), currentTime) > 0 ? 1 : 0;
+                oldFriendWithDestination = epidemicEncounteredNode.getNumberOfFriendsInterestedInTopic(message.getTags().getTopics(), currentTime);
+                newFriendWithDestination = this.getNumberOfFriendsInterestedInTopic(message.getTags().getTopics(), currentTime);
+                oldCommonCommunity = epidemicEncounteredNode.getSameCommunityNodesInterestedInTopic(message.getTags().getTopics(), currentTime);
+                newCommonCommunity = this.getSameCommunityNodesInterestedInTopic(message.getTags().getTopics(), currentTime);
             } else {
                 oldFriendWithDestination = epidemicEncounteredNode.socialNetwork[message.getDestination()] ? 1 : 0;
                 newFriendWithDestination = this.socialNetwork[message.getDestination()] ? 1 : 0;
+                oldCommonCommunity = epidemicEncounteredNode.inLocalCommunity(message.getDestination()) ? 1 : 0;
+                newCommonCommunity = this.inLocalCommunity(message.getDestination())  ? 1 : 0;
             }
 
             String oldRelayBattery = "" + epidemicEncounteredNode.getBattery().getPercentage();
@@ -124,9 +130,7 @@ public class Epidemic extends Node {
 //            String newRelayCentrality = df.format(this.getCentrality(false));
 //            String oldRelayLocalCentrality = df.format(epidemicEncounteredNode.getCentrality(true));
 //            String newRelayLocalCentrality = df.format(this.getCentrality(true));
-            Integer oldCommonCommunity = epidemicEncounteredNode.inLocalCommunity(message.getDestination()) ? 1 : 0;
-            Integer newCommonCommunity = this.inLocalCommunity(message.getDestination())  ? 1 : 0;
-            String oldDataMemory = "" + ((float) epidemicEncounteredNode.getDataMemorySize() / epidemicEncounteredNode.dataMemorySize);
+             String oldDataMemory = "" + ((float) epidemicEncounteredNode.getDataMemorySize() / epidemicEncounteredNode.dataMemorySize);
             String newDataMemory = "" + ((float) this.getDataMemorySize() / this.dataMemorySize);
 
             if (outputWriteCondition) {

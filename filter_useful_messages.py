@@ -37,6 +37,16 @@ def process_message(index, row, sent_messages):
 
     return indices_to_update  # Return the indices to update
 
+
+def save_to_file(df):
+    location = f"dataset/{os.environ.get('DATASET')}/useful_messages"
+    if 'DISSEMINATION' in os.environ and os.environ['DISSEMINATION'] == 'true':
+        location += '_dissemination'
+
+    location += '.csv'
+
+    df.to_csv(location)
+
 if __name__ == "__main__":
     sent_messages_file = f"dataset/{os.environ.get('DATASET')}/sent_messages"
 
@@ -51,6 +61,8 @@ if __name__ == "__main__":
         sent_messages = pd.read_csv(sent_messages_file, nrows=10000000, engine="python")
     else:
         sent_messages = pd.read_csv(sent_messages_file)
+        
+        
 
     print(f"sent_messages columns: {sent_messages.columns}")
 
@@ -58,6 +70,10 @@ if __name__ == "__main__":
     if os.environ.get('DISSEMINATION') == 'true':
         successful_messages_file += "_dissemination"
     successful_messages_file += ".csv"
+    
+    
+    # TO BE REMOVED
+    
 
     # Read successful messages with size consideration
     if file_size > 8 * 1024 * 1024:
@@ -65,7 +81,13 @@ if __name__ == "__main__":
     else:
         successful_messages = pd.read_csv(successful_messages_file, engine="python")
 
+    # TO BE REMOVED
+    sent_messages.head(5000000)
+    successful_messages.head(2000000)
+
     print(f"successful messages columns: {successful_messages.columns}")
+
+
 
     # Filter sent messages based on successful messages
     sent_messages = sent_messages[sent_messages["messageId"].isin(successful_messages["messageId"])]
@@ -109,3 +131,7 @@ if __name__ == "__main__":
         elapsed_time = end_time - start_time
         print(f"Elapsed time {elapsed_time}")
         print(f"Completed batch {start_idx//batch_size + 1} of {(total + batch_size - 1)//batch_size}")
+
+
+
+    save_to_file(sent_messages)
