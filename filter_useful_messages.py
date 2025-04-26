@@ -5,20 +5,22 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 import time
 
-
+MAX_QUEUE_SIZE = 200
+SENT_MAX_SIZE = 500000
+MAX_FILE_SIZE = 3 * 1024 * 1024 * 1024
+SUCCESSFUL_MAX_SIZE = 100000
 
 def process_message(index, row, sent_messages):
-
     message_id, last_relay, destination = row.iloc[:3]
 
     indices_to_update = []
-    visited = []
+    visited = set()
     queue = sent_messages[(sent_messages["messageId"] == message_id) & (sent_messages["newRelayId"] == last_relay)].index.tolist()
     max_len = 0
 
     while queue:
         curr_idx = queue.pop()
-        visited.append(curr_idx)
+        visited.add(curr_idx)
         indices_to_update.append(curr_idx)
 
         sent_messages_row = sent_messages.iloc[curr_idx]
@@ -28,8 +30,9 @@ def process_message(index, row, sent_messages):
             break
 
         last_relay = old_relay_id
+
         for idx in sent_messages[(sent_messages["messageId"] == message_id) & (sent_messages["newRelayId"] == last_relay)].index.tolist():
-            if idx not in visited and len(queue) < 200:
+            if idx not in visited and len(queue) < MAX_QUEUE_SIZE:
                 queue.insert(0, idx)
                 if (len(queue) > max_len):
                     max_len = len(queue)
@@ -38,7 +41,7 @@ def process_message(index, row, sent_messages):
     return indices_to_update  # Return the indices to update
 
 
-def save_to_file(df):
+def save_to_file(df, curr_idx=None):
     location = f"dataset/{os.environ.get('DATASET')}/useful_messages"
     if 'DISSEMINATION' in os.environ and os.environ['DISSEMINATION'] == 'true':
         location += '_dissemination'
@@ -46,6 +49,10 @@ def save_to_file(df):
     location += '.csv'
 
     df.to_csv(location)
+
+    if curr_idx:
+        with open(f"{os.environ.get('DATASET')}.tmp", "w") as f:
+            f.write(str(curr_idx))
 
 if __name__ == "__main__":
     sent_messages_file = f"dataset/{os.environ.get('DATASET')}/sent_messages"
@@ -56,44 +63,33 @@ if __name__ == "__main__":
 
     file_size = os.path.getsize(sent_messages_file)
 
-    # Read sent messages with size consideration
-    if file_size > 3 * 1024 * 1024 * 1024:
-        sent_messages = pd.read_csv(sent_messages_file, nrows=10000000, engine="python")
-    else:
-        sent_messages = pd.read_csv(sent_messages_file)
-        
-        
-
-    print(f"sent_messages columns: {sent_messages.columns}")
-
     successful_messages_file = f"dataset/{os.environ.get('DATASET')}/successful"
     if os.environ.get('DISSEMINATION') == 'true':
         successful_messages_file += "_dissemination"
     successful_messages_file += ".csv"
-    
-    
-    # TO BE REMOVED
-    
 
-    # Read successful messages with size consideration
-    if file_size > 8 * 1024 * 1024:
-        successful_messages = pd.read_csv(successful_messages_file, nrows=200000, engine="python")
+    print(f"Sent messages file size {file_size}")
+    
+    # Read sent messages with size consideration
+    if file_size > MAX_FILE_SIZE:
+        print("reading just n rows")
+        sent_messages = pd.read_csv(sent_messages_file, nrows=SENT_MAX_SIZE, engine="python")
     else:
-        successful_messages = pd.read_csv(successful_messages_file, engine="python")
-
-    # TO BE REMOVED
-    sent_messages.head(5000000)
-    successful_messages.head(2000000)
-
-    print(f"successful messages columns: {successful_messages.columns}")
+        sent_messages = pd.read_csv(sent_messages_file)
 
 
-
+    successful_messages = pd.read_csv(successful_messages_file, engine="python")
+    
     # Filter sent messages based on successful messages
     sent_messages = sent_messages[sent_messages["messageId"].isin(successful_messages["messageId"])]
-    if sent_messages.shape[0] > 350000:
-        sent_messages = sent_messages.sample(350000)
+    
+    
+    if successful_messages.shape[0] > SUCCESSFUL_MAX_SIZE:
+        successful_messages = successful_messages.sample(SUCCESSFUL_MAX_SIZE)
 
+
+    if sent_messages.shape[0] > SENT_MAX_SIZE:
+        sent_messages = sent_messages.sample(SENT_MAX_SIZE)
     successful_messages = successful_messages[successful_messages["messageId"].isin(sent_messages["messageId"])]
     print("read the dataframes")
 
@@ -106,9 +102,11 @@ if __name__ == "__main__":
     count = 0
     total = successful_messages.shape[0]
 
-
     # Process in smaller batches
     batch_size = 50  # Adjust as needed
+
+    print(f"Number of batches {total // batch_size}")
+    
     for start_idx in range(0, total, batch_size):
         start_time = time.time()
         end_idx = min(start_idx + batch_size, total)
@@ -132,6 +130,10 @@ if __name__ == "__main__":
         print(f"Elapsed time {elapsed_time}")
         print(f"Completed batch {start_idx//batch_size + 1} of {(total + batch_size - 1)//batch_size}")
 
+
+        if (start_idx//batch_size + 1) % 100 == 0:
+            print("saving intermediary result")
+            save_to_file(sent_messages, curr_idx=end_idx)
 
 
     save_to_file(sent_messages)
