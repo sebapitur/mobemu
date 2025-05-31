@@ -1,9 +1,9 @@
-scikit-learn
+scikit-learn==1.5.2
 scipy
 graphviz
 shap
 matplotlib
 tensorflow
-sklearn2pmml
+sklearn2pmml==0.113.0
 setuptools
 tabulate

@@ -35,7 +35,7 @@ public final class App {
         try {
             System.out.println("Working Directory = " + System.getProperty("user.dir"));
             Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                .load(new File("C:/Users/sebastian.pitur/Documents/facultate/mobemu/src/main/resources/model-rf-UPB2015.pmml"))
+                .load(new File("C:/Users/sebastian.pitur/Documents/facultate/mobemu/src/main/resources/model-rf-Haggle-Content.pmml"))
                 .build();
                 // Perforing the self-check
             evaluator.verify();
@@ -50,6 +50,9 @@ public final class App {
 
 
             Map<String, Object> arguments = new HashMap<>();
+
+
+            {oldDataMemory=0.0, oldFriendWithDestination=0, oldRelayBattery=0.012039829745041225, newDataMemory=0.0, newCommonCommunity=0, newFriendWithDestination=0, oldCommonCommunity=0, newRelayBattery=0.015421102090962664}
 
             arguments.put("messageHopCount", 0);
             arguments.put("oldFriendWithDestination", 1);

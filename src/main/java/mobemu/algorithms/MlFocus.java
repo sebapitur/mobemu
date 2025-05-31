@@ -105,7 +105,7 @@ public class MlFocus extends Node {
                    long seed, long traceStart, long traceEnd, boolean altruism, boolean dissemination) {
         super(id, nodes, context, socialNetwork, dataMemorySize, exchangeHistorySize, seed, traceStart, traceEnd);
         this.altruismAnalysis = altruism;
-        this.dissemination = true;
+        this.dissemination = dissemination;
     }
 
 
@@ -216,6 +216,7 @@ public class MlFocus extends Node {
             var results = evaluator.evaluate(arguments);
 
             int finalResult = (int)EvaluatorUtil.decodeAll(results).get(evaluator.getTargetFields().get(0).getName());
+
             // if the node that doesn't have the message is the better one (has met
             // the destination more recently plus delta), transfer the message
             if (finalResult == 1) {

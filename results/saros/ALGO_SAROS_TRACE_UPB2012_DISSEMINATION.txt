@@ -1,0 +1,10 @@
+Trace duration in hours: 1507.7394444444444
+Trace contacts: 5986
+Trace contacts per hour: 3.9701819979947905
+Nodes: 24
+Messages: 30240
+SAROS raw
+HitRate 0.35842646921858995
+DeliveryCost 7.024683337990128
+DeliveryLatency 968274.1998155089
+HopCount 31.19101320670144

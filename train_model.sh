@@ -3,9 +3,17 @@
 # models=("neural" "rf" "svm")
 models=("neural" "svm", "rf")
 
-datasets=("UPB2011" "UPB2012" "UPB2015"
-           "Haggle-Cambridge" "Haggle-Content" "Haggle-Infocom2006" "Haggle-Intel"
-           "NCCU" "Sigcomm" "SocialBlueConn" "StAndrews")
+datasets=("UPB2011" "UPB2012" "UPB2015" "Haggle-Content" "Haggle-Infocom2006" "Haggle-Intel"
+           "NCCU" "Sigcomm" "SocialBlueConn")
+
+if [ -n "$DISSEMINATION" ]; then
+    echo "DISSEMINATION is $DISSEMINATION"
+else
+    echo "Variable DISSEMINATION is unset and by default, False"
+    DISSEMINATION="false"
+fi
+
+
 
 if [[ "$DISSEMINATION" == "true" ]]; then
     datasets=("UPB2012" "Haggle-Infocom2006" "SocialBlueConn" "Sigcomm")
@@ -21,14 +29,17 @@ function wait_for_jobs() {
     done
 }
 
+
+
+
 for dataset in "${datasets[@]}"; do
     for model in "${models[@]}"; do
         wait_for_jobs  # Ensure we don't exceed MAX_PROCS
         (
             source .venv/Scripts/activate
-            # source .venv/bin/activate
             export MODEL="$model"
             export DATASET="$dataset"
+            export DISSEMINATION="$DISSEMINATION"
             python train_model.py
         ) &
     done

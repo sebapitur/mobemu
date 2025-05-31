@@ -5,12 +5,6 @@ Nodes: 6
 Messages: 36
 MlFocus
 HitRate 1.0
-DeliveryCost 37.361111111111114
-DeliveryLatency 2357.5
-HopCount 13.055555555555555
-Messages: 36
-MlFocus
-HitRate 1.0
-DeliveryCost 37.361111111111114
-DeliveryLatency 2357.5
-HopCount 13.055555555555555
+DeliveryCost 29.305555555555557
+DeliveryLatency 2083.166666666667
+HopCount 2.361111111111111

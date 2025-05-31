@@ -106,10 +106,12 @@ def main():
     # Convert to DataFrame and save to CSV
     df = pd.DataFrame(data)
 
+
     # Reorder columns for better readability
     columns_order = ['dataset', 'model_info', 'algo', 'dissemination', 'trace_duration',    'contacts','contacts_per_hour', 'nodes', 'messages',
                       'hit_rate', 'delivery_cost', 'delivery_latency', 'hop_count']
     df = df[columns_order]
+
 
     # Save to CSV
     output_file = 'trace_metrics.csv'

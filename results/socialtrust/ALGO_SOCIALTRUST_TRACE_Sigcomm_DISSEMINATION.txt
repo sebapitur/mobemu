@@ -1,0 +1,10 @@
+Trace duration in hours: 89.07055555555556
+Trace contacts: 16596
+Trace contacts per hour: 186.3241999164208
+Nodes: 76
+Messages: 17556
+Social Trust raw
+HitRate 0.4582652208984417
+DeliveryCost 81.25288570673938
+DeliveryLatency 45389.62354938705
+HopCount 316.0614670467467

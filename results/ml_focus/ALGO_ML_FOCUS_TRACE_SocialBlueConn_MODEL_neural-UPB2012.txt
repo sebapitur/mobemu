@@ -4,7 +4,7 @@ Trace contacts per hour: 60.275818139284496
 Nodes: 15
 Messages: 2025
 MlFocus
-HitRate 1.0
-DeliveryCost 299.3762962962963
-DeliveryLatency 59564.90814814815
-HopCount 7.510617283950618
+HitRate 0.980246913580247
+DeliveryCost 946.9713580246913
+DeliveryLatency 59942.987405541564
+HopCount 5.056926952141058

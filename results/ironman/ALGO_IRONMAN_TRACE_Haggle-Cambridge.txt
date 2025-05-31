@@ -1,0 +1,10 @@
+Trace duration in hours: 145.56694444444443
+Trace contacts: 4229
+Trace contacts per hour: 29.051925326453468
+Nodes: 12
+Messages: 1008
+IRONMAN
+HitRate 0.5773809523809523
+DeliveryCost 3.6924603174603177
+DeliveryLatency 47586.93470790378
+HopCount 3.7628865979381443

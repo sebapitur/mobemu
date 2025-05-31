@@ -38,7 +38,7 @@ def process_message(index, row, sent_messages):
                     max_len = len(queue)
 
 
-    return indices_to_update  # Return the indices to update
+    return indices_to_update
 
 
 def save_to_file(df, curr_idx=None):
@@ -48,7 +48,7 @@ def save_to_file(df, curr_idx=None):
 
     location += '.csv'
 
-    df.to_csv(location)
+    df.to_csv(location, index=False)
 
     if curr_idx:
         with open(f"{os.environ.get('DATASET')}.tmp", "w") as f:
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     successful_messages_file += ".csv"
 
     print(f"Sent messages file size {file_size}")
-    
+
     # Read sent messages with size consideration
     if file_size > MAX_FILE_SIZE:
         print("reading just n rows")
@@ -79,11 +79,11 @@ if __name__ == "__main__":
 
 
     successful_messages = pd.read_csv(successful_messages_file, engine="python")
-    
+
     # Filter sent messages based on successful messages
     sent_messages = sent_messages[sent_messages["messageId"].isin(successful_messages["messageId"])]
-    
-    
+
+
     if successful_messages.shape[0] > SUCCESSFUL_MAX_SIZE:
         successful_messages = successful_messages.sample(SUCCESSFUL_MAX_SIZE)
 
@@ -106,8 +106,23 @@ if __name__ == "__main__":
     batch_size = 50  # Adjust as needed
 
     print(f"Number of batches {total // batch_size}")
-    
-    for start_idx in range(0, total, batch_size):
+
+    start = 0
+    tmp_file_name = f"{os.environ['DATASET']}.tmp"
+
+    if os.path.exists(tmp_file_name):
+        with open(tmp_file_name, "r") as f:
+            start = int(f.read())
+            location = f"dataset/{os.environ.get('DATASET')}/useful_messages"
+            if 'DISSEMINATION' in os.environ and os.environ['DISSEMINATION'] == 'true':
+                location += '_dissemination'
+
+            location += '.csv'
+            successful_messages = pd.read_csv(location, index_col=None)
+            print(f"Continuing from {start} index")
+
+
+    for start_idx in range(start, total, batch_size):
         start_time = time.time()
         end_idx = min(start_idx + batch_size, total)
         batch = successful_messages.iloc[start_idx:end_idx]
@@ -135,5 +150,9 @@ if __name__ == "__main__":
             print("saving intermediary result")
             save_to_file(sent_messages, curr_idx=end_idx)
 
+
+    sent_messages['usefulTransfer'] = sent_messages['usefulTransfer'].fillna(0)
+
+    sent_messages = sent_messages.drop(["messageId","messageSource","oldRelayId","newRelayId"], axis=1)
 
     save_to_file(sent_messages)

@@ -7,7 +7,7 @@ from sklearn2pmml import PMMLPipeline
 from sklearn2pmml import sklearn2pmml
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FunctionTransformer, Pipeline
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
@@ -16,7 +16,10 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder
 
 dataset_filename = f"dataset/{os.environ.get('DATASET')}/useful_messages"
 
-if os.environ.get('DISSEMINATION') == 'true':
+
+is_dissemination = os.environ.get('DISSEMINATION') == 'true'
+
+if is_dissemination:
     dataset_filename += "_dissemination"
 
 dataset_filename += '.csv'
@@ -35,32 +38,40 @@ negative_df = negative_df.sample(lesser_len)
 balanced_df = pd.concat([positive_df, negative_df], ignore_index=True)
 preprocessed_df = balanced_df.drop(columns="usefulTransfer").copy()
 
-minmax_columns = ["messageHopCount"]
-categorial_columns = [
-    "oldFriendWithDestination",
-    "oldCommonCommunity",
-    "newFriendWithDestination",
-    "newCommonCommunity",
-]
+
+
+TransformerType = Union[FunctionTransformer, MinMaxScaler, StandardScaler, OneHotEncoder]
+
+transformers: List[Tuple[str, TransformerType, List[str]]] = []
+
+categorial_columns = []
+
+if not is_dissemination:
+    categorial_columns = [
+        "oldFriendWithDestination",
+        "oldCommonCommunity",
+        "newFriendWithDestination",
+        "newCommonCommunity",
+    ]
 
 standard_columns = [
     col
     for col in preprocessed_df.select_dtypes(include=["float64", "int64"]).columns
-    if col not in minmax_columns and col not in categorial_columns
+    if col and col not in categorial_columns
 ]
 
-TransformerType = Union[MinMaxScaler, StandardScaler, OneHotEncoder]
 
-transformers: List[Tuple[str, TransformerType, List[str]]] = []
+scaler = FunctionTransformer()
 
-if os.environ.get("DISSEMINATION") != "true":
-    transformers = [
-        ("minmax", MinMaxScaler((0, 1)), minmax_columns),
-    ]
+if os.environ['MODEL'] == 'svm':
+    scaler = StandardScaler()
+elif os.environ['MODEL'] == 'neural':
+    scaler = MinMaxScaler()
+
 
 transformers.extend([
-        ("standard", StandardScaler(), standard_columns),
-        ("onehotencoder", OneHotEncoder(), categorial_columns)
+        ("standard", scaler, standard_columns),
+        ("onehotencoder", OneHotEncoder() if not is_dissemination else FunctionTransformer(), categorial_columns)
     ])
 
 preprocessor = ColumnTransformer(
@@ -69,11 +80,18 @@ preprocessor = ColumnTransformer(
 )
 
 preprocessed_df = preprocessor.fit_transform(preprocessed_df)
+
+print(f"Preprocessed matrix shape: {preprocessed_df.shape}")
+
+
+
 X = balanced_df.copy().drop(columns=["usefulTransfer"])
 result_df = pd.DataFrame(balanced_df["usefulTransfer"].copy().squeeze())
 labelencoder = LabelEncoder()
 y = labelencoder.fit_transform(result_df)
 
+
+print(f"Balanced dataframe columns: {balanced_df.columns}")
 
 def display_metrics(y_test, y_pred, save=False):
     # Evaluate the model
@@ -82,7 +100,7 @@ def display_metrics(y_test, y_pred, save=False):
 
     if save:
         filename = f"metrics-{os.environ['MODEL']}"
-        
+
         if "DISSEMINATION" in os.environ and os.environ["DISSEMINATION"] == 'true':
             filename += "-dissemination"
 

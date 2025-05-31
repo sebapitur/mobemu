@@ -5,6 +5,6 @@ Nodes: 15
 Messages: 2025
 MlFocus
 HitRate 1.0
-DeliveryCost 241.89481481481482
-DeliveryLatency 59651.082962962966
-HopCount 14.602469135802469
+DeliveryCost 293.0701234567901
+DeliveryLatency 59572.97827160494
+HopCount 8.22320987654321

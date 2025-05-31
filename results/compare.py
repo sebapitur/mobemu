@@ -3,8 +3,14 @@ import os
 
 
 ml_df = pd.read_csv("ml_trace_metrics.csv")
-epidemic_df = pd.read_csv("epidemic_trace_metrics.csv")
-spray_focus_df = pd.read_csv("spray_focus_trace_metrics.csv")
+# epidemic_df = pd.read_csv("epidemic_trace_metrics.csv")
+# spray_focus_df = pd.read_csv("spray_focus_trace_metrics.csv")
+
+
+algos = ["epidemic", "spray_focus", "ironman", "moghadamschulzrinne", "onside", "saros", "sense", "socialtrust"]
+
+
+datasets = {algo: pd.read_csv(f"{algo}_trace_metrics.csv") for algo in algos}
 
 # Assuming df is your dataframe with all the data
 # First, let's create separate dataframes for each algorithm type
@@ -16,19 +22,18 @@ if 'DISSEMINATION' in os.environ:
 
 
 ml_focus_df = ml_df[ml_df["dissemination"]==filter]
-epidemic_df = epidemic_df[epidemic_df["dissemination"]==filter]
-spray_focus_df = spray_focus_df[spray_focus_df['dissemination'] == filter]
+
+algos_df = {algo: datasets[algo][datasets[algo]["dissemination"] == filter] for algo in algos}
 
 # Function to compare ML_FOCUS with other algorithms for each dataset
 def compare_performance(dataset_name):
     # Filter data for the specific dataset
     ml_data = ml_focus_df[ml_focus_df['dataset'] == dataset_name]
-    epidemic_data = epidemic_df[epidemic_df['dataset'].str.contains(dataset_name.split('_')[0])]
-    spray_data = spray_focus_df[spray_focus_df['dataset'].str.contains(dataset_name.split('_')[0])]
+    compared_datas = {algo: algos_df[algo][algos_df[algo]['dataset'].str.contains(dataset_name.split('_')[0])] for algo in algos}
 
-    # If any algorithm doesn't have data for this dataset, return None
-    if ml_data.empty or epidemic_data.empty or spray_data.empty:
-        return None
+    for algo in algos:
+        if compared_datas[algo].empty:
+            del compared_datas[algo]
 
     results = {
         'dataset': dataset_name,
@@ -40,9 +45,7 @@ def compare_performance(dataset_name):
         'improvement_percentage': []
     }
 
-    # Get epidemic and spray values for this dataset
-    epidemic_values = epidemic_data.iloc[0]
-    spray_values = spray_data.iloc[0]
+    algo_values = {algo: compared_datas[algo].iloc[0] for algo in compared_datas.keys()}
 
     # Metrics to compare
     metrics = ['hit_rate', 'delivery_cost', 'delivery_latency', 'hop_count']
@@ -53,48 +56,33 @@ def compare_performance(dataset_name):
 
         for metric in metrics:
             ml_value = ml_row[metric]
-            epidemic_value = epidemic_values[metric]
-            spray_value = spray_values[metric]
+            algo_value_row = {algo: algo_values[algo][metric] for algo in algo_values.keys()}
 
-            # For hit_rate, higher is better
-            if metric == 'hit_rate':
-                if ml_value > epidemic_value:
-                    improvement = ((ml_value - epidemic_value) / epidemic_value) * 100
-                    results['metric'].append(metric)
-                    results['ML_FOCUS_model'].append(model_name)
-                    results['ML_FOCUS_value'].append(ml_value)
-                    results['comparison_algo'].append('EPIDEMIC')
-                    results['comparison_value'].append(epidemic_value)
-                    results['improvement_percentage'].append(improvement)
-
-                if ml_value > spray_value:
-                    improvement = ((ml_value - spray_value) / spray_value) * 100
-                    results['metric'].append(metric)
-                    results['ML_FOCUS_model'].append(model_name)
-                    results['ML_FOCUS_value'].append(ml_value)
-                    results['comparison_algo'].append('SPRAY_FOCUS')
-                    results['comparison_value'].append(spray_value)
-                    results['improvement_percentage'].append(improvement)
-
-            # For other metrics, lower is better
-            else:
-                if ml_value < epidemic_value:
-                    improvement = ((epidemic_value - ml_value) / epidemic_value) * 100
-                    results['metric'].append(metric)
-                    results['ML_FOCUS_model'].append(model_name)
-                    results['ML_FOCUS_value'].append(ml_value)
-                    results['comparison_algo'].append('EPIDEMIC')
-                    results['comparison_value'].append(epidemic_value)
-                    results['improvement_percentage'].append(improvement)
-
-                if ml_value < spray_value:
-                    improvement = ((spray_value - ml_value) / spray_value) * 100
-                    results['metric'].append(metric)
-                    results['ML_FOCUS_model'].append(model_name)
-                    results['ML_FOCUS_value'].append(ml_value)
-                    results['comparison_algo'].append('SPRAY_FOCUS')
-                    results['comparison_value'].append(spray_value)
-                    results['improvement_percentage'].append(improvement)
+            for algo in algo_value_row.keys():
+                print(algo)
+                compared_value = algo_value_row[algo]
+                # For hit_rate, higher is better
+                if metric == 'hit_rate':
+                    print(f"hit rate {ml_value} compared to {compared_value}")
+                    if ml_value > compared_value:
+                        improvement = ((ml_value - compared_value) / compared_value) * 100
+                        results['metric'].append(metric)
+                        results['ML_FOCUS_model'].append(model_name)
+                        results['ML_FOCUS_value'].append(ml_value)
+                        results['comparison_algo'].append(str(algo).upper())
+                        results['comparison_value'].append(compared_value)
+                        results['improvement_percentage'].append(improvement)
+                # For other metrics, lower is better
+                else:
+                    print(f"other metrics {ml_value} compared to {compared_value}")
+                    if ml_value < compared_value:
+                        improvement = ((compared_value - ml_value) / compared_value) * 100
+                        results['metric'].append(metric)
+                        results['ML_FOCUS_model'].append(model_name)
+                        results['ML_FOCUS_value'].append(ml_value)
+                        results['comparison_algo'].append(str(algo).upper())
+                        results['comparison_value'].append(compared_value)
+                        results['improvement_percentage'].append(improvement)
 
     # Return a dataframe with the results
     if results['metric']:
@@ -122,10 +110,11 @@ if all_comparisons:
     # Round numeric columns for better readability
     numeric_cols = ['ML_FOCUS_value', 'comparison_value', 'improvement_percentage']
     final_results[numeric_cols] = final_results[numeric_cols].round(2)
-
     print("Instances where ML_FOCUS performs better:")
     print(final_results)
     filename = "comparison_dissemination.csv" if filter else "comparison_routing.csv"
+
+    print(f"Saving results to filename {filename}")
     final_results.to_csv(filename)
 else:
     print("No instances found where ML_FOCUS performs better")

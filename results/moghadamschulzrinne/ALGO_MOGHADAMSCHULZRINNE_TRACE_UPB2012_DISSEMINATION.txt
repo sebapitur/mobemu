@@ -1,0 +1,10 @@
+Trace duration in hours: 1507.7394444444444
+Trace contacts: 5986
+Trace contacts per hour: 3.9701819979947905
+Nodes: 24
+Messages: 30240
+Moghadam Schulzrinne
+HitRate 0.3638260221663407
+DeliveryCost 4.42236658284437
+DeliveryLatency 1052313.2982605468
+HopCount 23.442683800942042
