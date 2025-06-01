@@ -109,13 +109,13 @@ public class MobEmu {
                         1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false, nodes, 5, 5, 2, ONSIDE.ONSIDESort.CommonTopics);
             } else if (System.getenv("ALGO").equals("SAROS")) {
                 nodes[i] = new SAROS(i, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), Math.random(), true, 5, 5, nodes);
+                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), Math.random(), true, 5, (double)2/3, nodes);
             } else if (System.getenv("ALGO").equals("MOGHADAMSCHULZRINNE")) {
                 nodes[i] = new MoghadamSchulzrinne(i, nodes.length, parser.getContextData().get(i), parser.getSocialNetwork()[i],
                         1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), false);
             } else if (System.getenv("ALGO").equals("SOCIALTRUST")) {
                 nodes[i] = new SocialTrust(i, parser.getContextData().get(i), parser.getSocialNetwork()[i],
-                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), SocialTrust.FilterType.COMMON_INTERESTS, 5, true, Math.random(), true, nodes);
+                        1000, 50, seed, parser.getTraceData().getStartTime(), parser.getTraceData().getEndTime(), SocialTrust.FilterType.COMMON_INTERESTS, 2, true, Math.random(), true, nodes);
             }
         }
 
